@@ -1,0 +1,20 @@
+{
+  "name": "jsparser",
+  "version": "0.0.1",
+  "description": "JavaScript Code analyzer",
+  "main": "app.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Disruptrons Team",
+  "license": "ISC",
+  "dependencies": {
+    "babylon": "^6.7.0",
+    "bluebird": "^3.3.4",
+    "convert-source-map": "^1.2.0",
+    "lodash": "^4.7.0",
+    "request": "^2.70.0",
+    "source-map": "^0.5.3"
+  }
+}
