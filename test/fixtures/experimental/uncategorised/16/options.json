@@ -1,0 +1,4 @@
+{
+  "plugins": ["asyncFunctions"],
+  "throws": "Unexpected token (2:4)"
+}

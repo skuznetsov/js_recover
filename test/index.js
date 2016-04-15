@@ -1,21 +1,23 @@
 var getFixtures = require("babel-helper-fixtures").multiple;
-var parse       = require("../lib").parse;
-var test        = require("ava");
+var parse       = require("babylon").parse;
 var _           = require("lodash");
+var unparse     = require("../unparse");
 
 var fixtures = getFixtures(__dirname + "/fixtures");
 
 _.each(fixtures, function (suites, name) {
   _.each(suites, function (testSuite) {
     _.each(testSuite.tests, function (task) {
-      test(name + "/" + testSuite.title + "/" + task.title, !task.disabled && function () {
-        try {
-          return runTest(task);
-        } catch (err) {
-          err.message = task.actual.loc + ": " + err.message;
-          throw err;
+        if (task.options.throws) {
+            return;
         }
-      });
+      console.log (name + "/" + testSuite.title + "/" + task.title);
+      console.log (task.actual.code);
+      console.log ("-----------------");
+      ast = parse(task.actual.code, task.options);
+      unparse.setupNodePrototype(ast, null);
+      console.log("" + ast);
+      console.log ("====================================");
     });
   });
 });

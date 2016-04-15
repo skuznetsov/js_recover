@@ -29,6 +29,9 @@ module.exports.setupNodePrototype = (ast, smc) => {
     ast.__proto__.toString = function () {
         nodesHierarchy.push(this);
         let res = "";
+        if (this == null) {
+            return "";
+        }
         let wrapInParenthesis = !!(this.extra && this.extra.parenthesized);
 
         if (this.leadingComments && this.leadingComments.length > 0) {
@@ -147,18 +150,23 @@ module.exports.setupNodePrototype = (ast, smc) => {
                 break;
             case "UpdateExpression":
                 let needBracketsForUpdate = !!(this.extra && this.extra.parenthesizedArgument);
-                res += (needBracketsForUpdate ? "(" : "") + this.argument + this.operator + (needBracketsForUpdate ? ")" : "");
+                if (this.prefix) {
+                    res += (needBracketsForUpdate ? "(" : "") + this.operator + this.argument + (needBracketsForUpdate ? ")" : "");
+                } else {
+                    res += (needBracketsForUpdate ? "(" : "") + this.argument + this.operator + (needBracketsForUpdate ? ")" : "");
+                }
                 break;
             case "File":
                 res += this.program;
                 break;
             case "Program":
             case "BlockStatement":
-                if (this.type == "BlockStatement") {
+            case "ClassBody":
+                if (this.type != "Program") {
                     res += "{\n";
                     level++;
                 }
-                if (this.directives.length > 0) {
+                if (this.type != "ClassBody" && this.directives.length > 0) {
                     _.each(this.directives, arg => {
                         res += spaces() + arg + "\n";
                     });
@@ -168,7 +176,7 @@ module.exports.setupNodePrototype = (ast, smc) => {
                         res += spaces() + stmt + shouldAddSemicolon(stmt) + "\n";
                     });
                 }
-                if (this.type == "BlockStatement") {
+                if (this.type != "Program") {
                     level--;
                     res += spaces() + "}";
                 }
@@ -210,7 +218,7 @@ module.exports.setupNodePrototype = (ast, smc) => {
                 res += this.extra.raw;
                 break;
             case "ReturnStatement":
-                res += "return " + this.argument;
+                res += "return " + (this.argument ? this.argument : "");
                 break;
             case "UnaryExpression":
                 let needBrackets = !!(this.extra && this.extra.parenthesizedArgument && !(this.argument.extra && this.argument.extra.parenthesized));
@@ -256,10 +264,10 @@ module.exports.setupNodePrototype = (ast, smc) => {
                 res += spaces() + "}";
                 break;
             case "BreakStatement":
-                res += "break";
+                res += `break  ${this.label || ""}`;
                 break;
             case "ContinueStatement":
-                res += "continue";
+                res += `continue ${this.label || ""}`;
                 break;
             case "ThrowStatement":
                 res += "throw " + this.argument;
@@ -329,6 +337,57 @@ module.exports.setupNodePrototype = (ast, smc) => {
                 break;
             case "EmptyStatement":
                 break;
+                
+            case "ExportDefaultDeclaration":
+                res += prependNewLineIfNeeded();
+                res += `export default ${this.declaration}`;
+                break;
+
+            case "ClassDeclaration":
+                res += `class ${this.id || ""} ${this.superclass ? " : " + this.superclass : ""} ${this.body}`;
+                break;
+                
+            case "ClassMethod":
+                res += prependNewLineIfNeeded();
+                let id = this.id || this.key;
+                res += spaces() + (id ? id + " " : "") + "(";
+                if (this.params.length > 0) {
+                    _.each(this.params, (arg, idx) => {
+                        res += arg + (idx < this.params.length - 1 ? ", " : "");
+                    });
+                }
+                res += ") " + spacesIfNeeded(this.body);
+                res += "\n";
+                break;
+                
+            case "DebuggerStatement":
+                res += "debugger";
+                break;
+                
+            case "DoWhileStatement":
+                res += `do ${this.body} while (${this.test})`;
+                break;
+                
+            case "LabeledStatement":
+                res += `${this.label}: ${this.body}`;
+                break;
+                
+            case "WithStatement":
+                res += `with (${this.object}) ${this.body}`;
+                break;
+
+            case "ObjectMethod":
+                res += prependNewLineIfNeeded();
+                let methodId = this.id || this.key;
+                res += spaces() + this.kind + " " + (methodId ? methodId + " " : "") + "(";
+                if (this.params.length > 0) {
+                    _.each(this.params, (arg, idx) => {
+                        res += arg + (idx < this.params.length - 1 ? ", " : "");
+                    });
+                }
+                res += ") " + spacesIfNeeded(this.body);
+                res += "\n";
+                break;
 
             // ObjectPattern
             // ArrayPattern
@@ -339,27 +398,18 @@ module.exports.setupNodePrototype = (ast, smc) => {
             // Super
             // RestProperty
             // SpreadProperty
-            // ObjectMethod
             // AwaitExpression
             // YieldExpression
             // ArrayPattern
             // AssignmentPattern
             // Decorator
-            // DebuggerStatement
-            // DoWhileStatement
-            // WithStatement
-            // LabeledStatement
             // ForOfStatement
-            // ClassDeclaration
             // ClassExpression
-            // ClassBody
             // ClassProperty
-            // ClassMethod
             // ExportNamespaceSpecifier
             // ExportAllDeclaration
             // ExportDefaultSpecifier
             // ExportNamespaceSpecifier
-            // ExportDefaultDeclaration
             // ExportNamedDeclaration
             // ExportSpecifier
             // ImportDeclaration
@@ -425,6 +475,18 @@ module.exports.setupNodePrototype = (ast, smc) => {
             res += ")";
         }
 
+        if (this.trailingComments && this.trailingComments.length > 0) {
+            res += "\n";
+            _.each(this.trailingComments, comment => {
+                if (comment.type == "CommentLine") {
+                    res += spaces() + `//${comment.value}\n`;
+                } else {
+                    let commentBlock = comment.value.replace(/\n/, "\n" + spaces());
+                    res += spaces() + `/*${commentBlock}*/\n`;
+                }
+            });
+        }
+
         nodesHierarchy.pop();        
         return res;
     }
@@ -433,10 +495,13 @@ module.exports.setupNodePrototype = (ast, smc) => {
 
 function RenderCallExpression(node) {
     let res = "";
-    res = node.callee.toString() + " (";
-    if (node.arguments.length > 0) {
-        _.each(node.arguments, (arg, idx) => {
-            res += arg.toString() + (idx < node.arguments.length - 1 ? ", " : "");
+    if (node.static) {
+        res += "static ";
+    }
+    res += (node.callee ||  "").toString() + " (";
+    if ((node.arguments ||  []).length > 0) {
+        _.each((node.arguments || []), (arg, idx) => {
+            res += arg.toString() + (idx < (node.arguments || []).length - 1 ? ", " : "");
         });
     }
     res += ")";
@@ -444,11 +509,13 @@ function RenderCallExpression(node) {
 }
 
 function shouldAddSemicolon(node) {
-    if (["ForStatement", "IfStatement", "FunctionDeclaration", "WhileStatement"].indexOf(node.type) > -1) {
+    if (["ForStatement", "IfStatement", "FunctionDeclaration",
+         "WhileStatement", "DoWhileStatement", "ForInStatement"
+        ].has(node.type) || (node.trailingComments || []).length > 0) {
         return "";
     }
             
-    return `;`;
+    return ";";
 }
 
 function spacesIfNeeded(node) {

@@ -10,6 +10,8 @@
   "author": "Disruptrons Team",
   "license": "ISC",
   "dependencies": {
+    "ava": "^0.14.0",
+    "babel-helper-fixtures": "^6.6.5",
     "babylon": "^6.7.0",
     "bluebird": "^3.3.4",
     "convert-source-map": "^1.2.0",
