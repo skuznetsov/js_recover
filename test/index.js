@@ -14,6 +14,9 @@ _.each(fixtures, function (suites, name) {
       console.log (name + "/" + testSuite.title + "/" + task.title);
       console.log (task.actual.code);
       console.log ("-----------------");
+      if (task.options.length > 0) {
+        console.log ("PARSE OPTIONS:\n",task.options, "\n-----------");
+      }
       ast = parse(task.actual.code, task.options);
       unparse.setupNodePrototype(ast, null);
       console.log("" + ast);

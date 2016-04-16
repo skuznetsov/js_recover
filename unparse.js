@@ -101,6 +101,7 @@ module.exports.setupNodePrototype = (ast, smc) => {
                 }
                 break;
             case "ObjectExpression":
+            case "ObjectPattern":
                 res += "{";
                 if (this.properties.length == 1) {
                     res += this.properties[0];
@@ -122,6 +123,7 @@ module.exports.setupNodePrototype = (ast, smc) => {
                 res += "new " + RenderCallExpression(this); 
                 break;
             case "ArrayExpression":
+            case "ArrayPattern":
                 res += "[";
                 if (this.elements.length == 1) {
                     res += this.elements[0];
@@ -206,7 +208,8 @@ module.exports.setupNodePrototype = (ast, smc) => {
                 }
                 break;
             case "AssignmentExpression":
-                res += `${this.left} ${this.operator} ${this.right}`;
+            case "AssignmentPattern":
+                res += `${this.left} ${this.operator || "="} ${this.right}`;
                 break;
             case "NullLiteral":
                 res += "null";
@@ -344,7 +347,9 @@ module.exports.setupNodePrototype = (ast, smc) => {
                 break;
 
             case "ClassDeclaration":
-                res += `class ${this.id || ""} ${this.superclass ? " : " + this.superclass : ""} ${this.body}`;
+            case "ClassExpression":
+                res += `class ${this.id || ""} ${this.superClass ? " extends " + this.superClass : ""} ${this.body}`;
+                /// res += `<<<[[[ ${JSON.stringify(this, null, "\t")} ]]]>>>`
                 break;
                 
             case "ClassMethod":
@@ -379,7 +384,7 @@ module.exports.setupNodePrototype = (ast, smc) => {
             case "ObjectMethod":
                 res += prependNewLineIfNeeded();
                 let methodId = this.id || this.key;
-                res += spaces() + this.kind + " " + (methodId ? methodId + " " : "") + "(";
+                res += this.kind + " " + (methodId ? methodId + " " : "") + "(";
                 if (this.params.length > 0) {
                     _.each(this.params, (arg, idx) => {
                         res += arg + (idx < this.params.length - 1 ? ", " : "");
@@ -388,9 +393,15 @@ module.exports.setupNodePrototype = (ast, smc) => {
                 res += ") " + spacesIfNeeded(this.body);
                 res += "\n";
                 break;
+                
+            case "RestElement":
+                res += `...${this.argument}`;
+                break;
+                
+            case "ExportAllDeclaration":
+                res += `export * from ${this.source}`;
+                break;
 
-            // ObjectPattern
-            // ArrayPattern
             // BindExpression
             // TaggedTemplateExpression
             // DoExpression
@@ -400,14 +411,10 @@ module.exports.setupNodePrototype = (ast, smc) => {
             // SpreadProperty
             // AwaitExpression
             // YieldExpression
-            // ArrayPattern
-            // AssignmentPattern
             // Decorator
             // ForOfStatement
-            // ClassExpression
             // ClassProperty
             // ExportNamespaceSpecifier
-            // ExportAllDeclaration
             // ExportDefaultSpecifier
             // ExportNamespaceSpecifier
             // ExportNamedDeclaration
@@ -468,7 +475,7 @@ module.exports.setupNodePrototype = (ast, smc) => {
             // JSXClosingElement
             // JSXElement
             default:
-                res += `MISSED <[ '${this.type}' ]>\n`;
+                res += `MISSED <[ ${JSON.stringify(this, null, '\t')} ]>\n`;
                 break;
         }
         if (wrapInParenthesis) {
