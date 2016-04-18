@@ -48,435 +48,11 @@ module.exports.setupNodePrototype = (ast, smc) => {
         if (wrapInParenthesis) {
             res += "(";
         }
-        switch (this.type) {
-            case "VariableDeclaration":
-                res += this.kind + " ";
-                _.each(this.declarations, (node, idx) => {
-                    res += node;
-                    res += (idx < this.declarations.length - 1) ? ", " : "";
-                });
-                break;
-            case "VariableDeclarator":
-                res += this.id.toString();
-                if (this.init) {
-                    res += " = " + this.init;
-                }
-                break;
-            case "Identifier":
-                let name = this.name;
-                if (smc) {
-                    let origLoc = smc.originalPositionFor({line: this.loc.start.line, column: this.loc.start.column});
-                    if (origLoc && origLoc.name) {
-                        name = origLoc.name;
-                    }
-                }
-                res += name;
-                break;
-            case "CallExpression":
-                res += RenderCallExpression(this);
-                break;
-            case "NumericLiteral":
-            case "StringLiteral":
-                res += this.extra.raw;
-                break;
-            case "ExpressionStatement":
-                res += this.expression;
-                break;
-            case "SequenceExpression":
-                if (this.expressions && this.expressions.length > 0) {
-                    _.each(this.expressions, (expr, idx) => {
-                        res += expr;
-                        if (idx < this.expressions.length - 1) {
-                            res += ", ";
-                        }
-                    });
-                }
-                break;
-            case "MemberExpression":
-                res += this.object;
-                if (this.computed) {
-                    res += "[" + this.property + "]";
-                } else {
-                    res += "." + this.property;
-                }
-                break;
-            case "ObjectExpression":
-            case "ObjectPattern":
-                res += "{";
-                if (this.properties.length == 1) {
-                    res += this.properties[0];
-                } else if (this.properties.length > 1) {
-                    level++;
-                    res += "\n";
-                    _.each(this.properties, (arg, idx) => {
-                        res += spaces() + arg + (idx < this.properties.length - 1 ? ", " : "") + "\n";
-                    });
-                    level--;
-                    res += spaces();
-                }
-                res += "}";
-                break;
-            case "ObjectProperty":
-                res += this.key + ": " + this.value;
-                break;
-            case "NewExpression":
-                res += "new " + RenderCallExpression(this); 
-                break;
-            case "ArrayExpression":
-            case "ArrayPattern":
-                res += "[";
-                if (this.elements.length == 1) {
-                    res += this.elements[0];
-                } else if (this.elements.length > 1) {
-                    level++;
-                    res += "\n";
-                    _.each(this.elements, (arg, idx) => {
-                        res += spaces() + arg + (idx < this.elements.length - 1 ? ", " : "") + "\n";
-                    });
-                    level--;
-                    res += spaces();
-                }
-                res += "]";
-                break;
-            case "ForStatement":
-                res += prependNewLineIfNeeded();
-                res += "for (" + (this.init ? this.init : "") + "; " +
-                                (this.test ? this.test : "") + "; " +
-                                (this.update ? this.update : "") +
-                    ") ";
-                    res += spacesIfNeeded(this.body);
-                break;
-            case "BinaryExpression":
-            case "LogicalExpression":
-                res += this.left + " " + this.operator + " " + this.right;
-                break;
-            case "UpdateExpression":
-                let needBracketsForUpdate = !!(this.extra && this.extra.parenthesizedArgument);
-                if (this.prefix) {
-                    res += (needBracketsForUpdate ? "(" : "") + this.operator + this.argument + (needBracketsForUpdate ? ")" : "");
-                } else {
-                    res += (needBracketsForUpdate ? "(" : "") + this.argument + this.operator + (needBracketsForUpdate ? ")" : "");
-                }
-                break;
-            case "File":
-                res += this.program;
-                break;
-            case "Program":
-            case "BlockStatement":
-            case "ClassBody":
-                if (this.type != "Program") {
-                    res += "{\n";
-                    level++;
-                }
-                if (this.type != "ClassBody" && this.directives.length > 0) {
-                    _.each(this.directives, arg => {
-                        res += spaces() + arg + "\n";
-                    });
-                }
-                if (this.body && this.body.length > 0) {
-                    _.each(this.body, stmt => {
-                        res += spaces() + stmt + shouldAddSemicolon(stmt) + "\n";
-                    });
-                }
-                if (this.type != "Program") {
-                    level--;
-                    res += spaces() + "}";
-                }
-                break;
-            case "IfStatement":
-                res += prependNewLineIfNeeded();
-                res += "if (" + this.test + ")" + spacesIfNeeded(this.consequent);
-                if (this.alternate) {
-                    res += spaces() + (this.consequent.type == "BlockStatement" ? " " : "") +
-                           "else " + spacesIfNeeded(this.alternate);
-                }
-                break;
-            case "FunctionDeclaration":
-            case "FunctionExpression":
-                if (this.type == "FunctionDeclaration") {
-                    res += prependNewLineIfNeeded();
-                }
-                res += "function " + (this.id ? this.id + " " : "") + "(";
-                if (this.params.length > 0) {
-                    _.each(this.params, (arg, idx) => {
-                        res += arg + (idx < this.params.length - 1 ? ", " : "");
-                    });
-                }
-                res += ") " + spacesIfNeeded(this.body);
-                if (this.type == "FunctionDeclaration") {
-                    res += "\n";
-                }
-                break;
-            case "AssignmentExpression":
-            case "AssignmentPattern":
-                res += `${this.left} ${this.operator || "="} ${this.right}`;
-                break;
-            case "NullLiteral":
-                res += "null";
-                break;
-            case "Directive":
-                res += this.value + ";";
-                break;
-            case "DirectiveLiteral":
-                res += this.extra.raw;
-                break;
-            case "ReturnStatement":
-                res += "return " + (this.argument ? this.argument : "");
-                break;
-            case "UnaryExpression":
-                let needBrackets = !!(this.extra && this.extra.parenthesizedArgument && !(this.argument.extra && this.argument.extra.parenthesized));
-                if (this.prefix) {
-                    res += this.operator + (this.operator.length > 1 ? " " : "") + (needBrackets ? "(" : "") + this.argument  + (needBrackets ? ")" : "");
-                } else {
-                    res += (needBrackets ? "(" : "") + this.argument  + (needBrackets ? ")" : "") + this.operator;
-                }
-                break;
-            case "ConditionalExpression":
-                res += this.test + " ? " + this.consequent + " : " + this.alternate;
-                break;
-            case "ThisExpression":
-                res += "this";
-                break;
-            case "RegExpLiteral":
-                res += this.extra.raw;
-                break;
-            case "SwitchCase":
-                if (this.test) {
-                    res += spaces() + "case " + this.test + ":\n";
-                } else {
-                    res += spaces() + "default:\n";
-                }
-                if (this.consequent && this.consequent.length > 0) {
-                    level++;
-                    _.each(this.consequent, node => {
-                        res += spaces() + node + ";\n";
-                    });
-                    level--;
-                }
-                break;
-            case "SwitchStatement":
-                res += prependNewLineIfNeeded();
-                res += "switch (" + this.discriminant + ") {\n";
-                if (this.cases && this.cases.length > 0) {
-                    level++;
-                    _.each(this.cases, caseNode => {
-                        res += spaces() + caseNode + "\n";
-                    });
-                    level--;
-                }
-                res += spaces() + "}";
-                break;
-            case "BreakStatement":
-                res += `break  ${this.label || ""}`;
-                break;
-            case "ContinueStatement":
-                res += `continue ${this.label || ""}`;
-                break;
-            case "ThrowStatement":
-                res += "throw " + this.argument;
-                break;
-            case "TryStatement":
-                res += "try " + this.block;
-                if (this.handler) {
-                    res += this.handler;
-                }
-                if (this.guardedHandlers && this.guardedHandlers.length > 0) {
-                    _.each(this.guardedHandlers, node => {
-                    res += node; 
-                    });
-                }
-                if (this.finally) {
-                    res += this.finally;
-                }
-                break;
-            case "CatchClause":
-                res += "catch (" + this.param + ") " + spacesIfNeeded(this.body);
-                break;
-            case "ArrowFunctionExpression":
-                let needFunctionBrackets = false;
-                if (this.id) {
-                    needFunctionBrackets = true;
-                    res += this.id + " ";
-                }
-                if (!this.params || this.params.length == 0 || this.params.length > 1) {
-                    needFunctionBrackets = true;
-                }
-                if (needFunctionBrackets) { 
-                    res += "(";
-                }
-                if (this.params && this.params.length > 0) {
-                    _.each(this.params, (arg, idx) => {
-                        res += arg + (idx < this.params.length - 1 ? ", " : "");
-                    });
-                }
-                if (needBrackets) {
-                    res += ")";
-                } 
-                res += " => " + spacesIfNeeded(this.body);
-                break;
-            case "BooleanLiteral":
-                res += this.value ? "true" : "false";
-                break;
-            case "TemplateLiteral":
-                res += "`";
-                _.each(this.quasis, (node, idx) =>{
-                    res += node;
-                    if (!node.tail) {
-                        res += "${" + this.expressions[idx] + "}";
-                    } 
-                });
-                res += "`";
-                break;
-            case "TemplateElement":
-                res += this.value.raw;
-                break;
-            case "ForInStatement":
-                res += prependNewLineIfNeeded();
-                res += `for (${this.left} in ${this.right}) ${spacesIfNeeded(this.body)}`;
-                break;
-            case "WhileStatement":
-                res += prependNewLineIfNeeded();
-                res += `while (${this.test})\n${spacesIfNeeded(this.body)}`;
-                break;
-            case "EmptyStatement":
-                break;
-                
-            case "ExportDefaultDeclaration":
-                res += prependNewLineIfNeeded();
-                res += `export default ${this.declaration}`;
-                break;
-
-            case "ClassDeclaration":
-            case "ClassExpression":
-                res += `class ${this.id || ""} ${this.superClass ? " extends " + this.superClass : ""} ${this.body}`;
-                /// res += `<<<[[[ ${JSON.stringify(this, null, "\t")} ]]]>>>`
-                break;
-                
-            case "ClassMethod":
-                res += prependNewLineIfNeeded();
-                let id = this.id || this.key;
-                res += spaces() + (id ? id + " " : "") + "(";
-                if (this.params.length > 0) {
-                    _.each(this.params, (arg, idx) => {
-                        res += arg + (idx < this.params.length - 1 ? ", " : "");
-                    });
-                }
-                res += ") " + spacesIfNeeded(this.body);
-                res += "\n";
-                break;
-                
-            case "DebuggerStatement":
-                res += "debugger";
-                break;
-                
-            case "DoWhileStatement":
-                res += `do ${this.body} while (${this.test})`;
-                break;
-                
-            case "LabeledStatement":
-                res += `${this.label}: ${this.body}`;
-                break;
-                
-            case "WithStatement":
-                res += `with (${this.object}) ${this.body}`;
-                break;
-
-            case "ObjectMethod":
-                res += prependNewLineIfNeeded();
-                let methodId = this.id || this.key;
-                res += this.kind + " " + (methodId ? methodId + " " : "") + "(";
-                if (this.params.length > 0) {
-                    _.each(this.params, (arg, idx) => {
-                        res += arg + (idx < this.params.length - 1 ? ", " : "");
-                    });
-                }
-                res += ") " + spacesIfNeeded(this.body);
-                res += "\n";
-                break;
-                
-            case "RestElement":
-                res += `...${this.argument}`;
-                break;
-                
-            case "ExportAllDeclaration":
-                res += `export * from ${this.source}`;
-                break;
-
-            // BindExpression
-            // TaggedTemplateExpression
-            // DoExpression
-            // MetaProperty
-            // Super
-            // RestProperty
-            // SpreadProperty
-            // AwaitExpression
-            // YieldExpression
-            // Decorator
-            // ForOfStatement
-            // ClassProperty
-            // ExportNamespaceSpecifier
-            // ExportDefaultSpecifier
-            // ExportNamespaceSpecifier
-            // ExportNamedDeclaration
-            // ExportSpecifier
-            // ImportDeclaration
-            // ImportNamespaceSpecifier
-            // ImportSpecifier
-            // ImportDefaultSpecifier
-            // DeclareClass
-            // FunctionTypeAnnotation
-            // TypeAnnotation
-            // DeclareFunction
-            // DeclareModule
-            // DeclareTypeAlias
-            // DeclareInterface
-            // InterfaceExtends
-            // InterfaceDeclaration
-            // TypeAlias
-            // TypeParameterDeclaration
-            // ExistentialTypeParam
-            // TypeParameterInstantiation
-            // ObjectTypeIndexer
-            // ObjectTypeProperty
-            // ObjectTypeCallProperty
-            // ObjectTypeAnnotation
-            // QualifiedTypeIdentifier
-            // GenericTypeAnnotation
-            // TypeofTypeAnnotation
-            // TupleTypeAnnotation
-            // FunctionTypeParam
-            // AnyTypeAnnotation
-            // VoidTypeAnnotation
-            // BooleanTypeAnnotation
-            // MixedTypeAnnotation
-            // NumberTypeAnnotation
-            // StringTypeAnnotation
-            // FunctionTypeAnnotation
-            // StringLiteralTypeAnnotation
-            // BooleanLiteralTypeAnnotation
-            // NumericLiteralTypeAnnotation
-            // NullLiteralTypeAnnotation
-            // ThisTypeAnnotation
-            // ArrayTypeAnnotation
-            // NullableTypeAnnotation
-            // IntersectionTypeAnnotation
-            // UnionTypeAnnotation
-            // TypeCastExpression
-            // TypeCastExpression
-            // ClassImplements
-            // JSXIdentifier
-            // JSXNamespacedName
-            // JSXMemberExpression
-            // JSXEmptyExpression
-            // JSXExpressionContainer
-            // JSXSpreadAttribute
-            // JSXAttribute
-            // JSXOpeningElement
-            // JSXClosingElement
-            // JSXElement
-            default:
-                res += `MISSED <[ ${JSON.stringify(this, null, '\t')} ]>\n`;
-                break;
+        let printMethod = this[this.type];
+        if (printMethod) {
+            res += printMethod.call(this);
+        } else {
+            res += `MISSED (even in methods) <[ ${JSON.stringify(this, null, '\t')} ]>\n`;
         }
         if (wrapInParenthesis) {
             res += ")";
@@ -548,3 +124,798 @@ function prependNewLineIfNeeded() {
 
     return res;
 }
+
+function VariableDeclaration() {
+    let res = "";
+    res += this.kind + " ";
+    _.each(this.declarations, (node, idx) => {
+        res += node;
+        res += (idx < this.declarations.length - 1) ? ", " : "";
+    });
+    
+    return res;
+}
+
+function VariableDeclarator() {
+    let res = "";
+    res += this.id.toString();
+    
+    if (this.init) {
+        res += " = " + this.init;
+    }
+    
+    return res;
+}
+
+function Identifier() {
+    let name = this.name;
+    if (smc) {
+        let origLoc = smc.originalPositionFor({line: this.loc.start.line, column: this.loc.start.column});
+        if (origLoc && origLoc.name) {
+            name = origLoc.name;
+        }
+    }
+    return name;
+}
+
+function CallExpression() {
+    return RenderCallExpression(this);
+}
+
+function NumericLiteral() {
+    return StringLiteral();
+}
+
+function StringLiteral() {
+    return this.extra.raw;
+}
+
+function ExpressionStatement() {
+    return this.expression;
+}
+
+function SequenceExpression() {
+    let res = "";
+
+    if (this.expressions && this.expressions.length > 0) {
+        _.each(this.expressions, (expr, idx) => {
+            res += expr;
+            if (idx < this.expressions.length - 1) {
+                res += ", ";
+            }
+        });
+    }
+    
+    return res;
+}
+
+function MemberExpression() {
+    let res = "";
+    res += this.object;
+
+    if (this.computed) {
+        res += "[" + this.property + "]";
+    } else {
+        res += "." + this.property;
+    }
+    
+    return res;
+}
+
+function ObjectExpression() {
+    return ObjectPattern();
+}
+
+function ObjectPattern() {
+    let res = "";
+
+    res += "{";
+    if (this.properties.length == 1) {
+        res += this.properties[0];
+    } else if (this.properties.length > 1) {
+        level++;
+        res += "\n";
+        _.each(this.properties, (arg, idx) => {
+            res += spaces() + arg + (idx < this.properties.length - 1 ? ", " : "") + "\n";
+        });
+        level--;
+        res += spaces();
+    }
+    res += "}";
+    
+    return res;
+}
+
+function ObjectProperty() {
+    let id = this.key;  
+
+    if (this.computed) {
+        id = `[${id}]`;
+    }
+    return id + ": " + this.value;
+}
+                
+function NewExpression() {
+    return "new " + RenderCallExpression(this); 
+}
+
+function ArrayExpression() {
+    return ArrayPattern();
+}
+
+function ArrayPattern() {
+    let res = "";
+
+    res += "[";
+    if (this.elements.length == 1) {
+        res += this.elements[0];
+    } else if (this.elements.length > 1) {
+        level++;
+        res += "\n";
+        _.each(this.elements, (arg, idx) => {
+            res += spaces() + arg + (idx < this.elements.length - 1 ? ", " : "") + "\n";
+        });
+        level--;
+        res += spaces();
+    }
+    res += "]";
+
+    return res;
+}
+
+function ForStatement() {
+    let res = "";
+
+    res += prependNewLineIfNeeded();
+    res += "for (" + (this.init ? this.init : "") + "; " +
+                    (this.test ? this.test : "") + "; " +
+                    (this.update ? this.update : "") +
+            ") ";
+    res += spacesIfNeeded(this.body);
+    
+    return res;
+}
+
+function BinaryExpression() {
+    return LogicalExpression();
+}
+
+function LogicalExpression() {
+    return this.left + " " + this.operator + " " + this.right;
+}
+
+function UpdateExpression() {
+    let needBracketsForUpdate = !!(this.extra && this.extra.parenthesizedArgument);
+    if (this.prefix) {
+        return (needBracketsForUpdate ? "(" : "") + this.operator + this.argument + (needBracketsForUpdate ? ")" : "");
+    } else {
+        return (needBracketsForUpdate ? "(" : "") + this.argument + this.operator + (needBracketsForUpdate ? ")" : "");
+    }
+}
+
+function File() {
+    return this.program;
+}
+
+function Program() {
+    return BlockStatement();   
+}
+
+function ClassBody() {
+    return BlockStatement();
+}
+
+function BlockStatement() {
+    let res = "";
+
+    if (this.type != "Program") {
+        res += "{\n";
+        level++;
+    }
+    if (this.type != "ClassBody" && this.directives.length > 0) {
+        _.each(this.directives, arg => {
+            res += spaces() + arg + "\n";
+        });
+    }
+    if (this.body && this.body.length > 0) {
+        _.each(this.body, stmt => {
+            res += spaces() + stmt + shouldAddSemicolon(stmt) + "\n";
+        });
+    }
+    if (this.type != "Program") {
+        level--;
+        res += spaces() + "}";
+    }
+
+    return res;
+}
+
+function IfStatement() {
+    let res = "";
+
+    res += prependNewLineIfNeeded();
+    res += "if (" + this.test + ")" + spacesIfNeeded(this.consequent);
+    if (this.alternate) {
+        res += spaces() + (this.consequent.type == "BlockStatement" ? " " : "") +
+                "else " + spacesIfNeeded(this.alternate);
+    }
+    
+    return res;
+}
+
+function FunctionExpression() {
+    return FunctionDeclaration();
+}
+
+function FunctionDeclaration() {
+    let res = "";
+
+    if (this.type == "FunctionDeclaration") {
+        res += prependNewLineIfNeeded();
+    }
+    res += "function " + (this.id ? this.id + " " : "") + "(";
+
+    if (this.params.length > 0) {
+        _.each(this.params, (arg, idx) => {
+            res += arg + (idx < this.params.length - 1 ? ", " : "");
+        });
+    }
+    res += ") " + spacesIfNeeded(this.body);
+    if (this.type == "FunctionDeclaration") {
+        res += "\n";
+    }
+
+    return res;
+}
+
+function AssignmentPattern() {
+    return AssignmentExpression();
+}
+
+function AssignmentExpression() {
+    return `${this.left} ${this.operator || "="} ${this.right}`;
+}
+
+function NullLiteral() {
+    return "null";
+}
+
+function Directive() {
+    return this.value + ";";
+}
+
+function DirectiveLiteral() {
+    return this.extra.raw;
+}
+
+function ReturnStatement() {
+    return "return " + (this.argument ? this.argument : "");
+}
+
+function UnaryExpression() {
+    let needBrackets = !!(this.extra && this.extra.parenthesizedArgument && !(this.argument.extra && this.argument.extra.parenthesized));
+    if (this.prefix) {
+        return this.operator + (this.operator.length > 1 ? " " : "") + (needBrackets ? "(" : "") + this.argument  + (needBrackets ? ")" : "");
+    } else {
+        return (needBrackets ? "(" : "") + this.argument  + (needBrackets ? ")" : "") + this.operator;
+    }
+}
+
+function ConditionalExpression() {
+    return this.test + " ? " + this.consequent + " : " + this.alternate;
+}
+
+function ThisExpression() {
+    return "this";
+}
+
+function RegExpLiteral() {
+    return this.extra.raw;
+}
+
+function SwitchCase() {
+    let res = "";
+
+    if (this.test) {
+        res += spaces() + "case " + this.test + ":\n";
+    } else {
+        res += spaces() + "default:\n";
+    }
+
+    if (this.consequent && this.consequent.length > 0) {
+        level++;
+        _.each(this.consequent, node => {
+            res += spaces() + node + ";\n";
+        });
+        level--;
+    }
+    
+    return res;
+}
+                
+function SwitchStatement() {
+    let res = "";
+
+    res += prependNewLineIfNeeded();
+    res += "switch (" + this.discriminant + ") {\n";
+    if (this.cases && this.cases.length > 0) {
+        level++;
+        _.each(this.cases, caseNode => {
+            res += spaces() + caseNode + "\n";
+        });
+        level--;
+    }
+    res += spaces() + "}";
+    
+    return res;
+}
+
+function BreakStatement() {
+    return `break  ${this.label || ""}`;
+}
+
+function ContinueStatement() {
+    return `continue ${this.label || ""}`;
+}
+
+function ThrowStatement() {
+    return "throw " + this.argument;
+}
+
+function TryStatement() {
+    let res = "";
+
+    res += "try " + this.block;
+
+    if (this.handler) {
+        res += this.handler;
+    }
+
+    if (this.guardedHandlers && this.guardedHandlers.length > 0) {
+        _.each(this.guardedHandlers, node => {
+        res += node; 
+        });
+    }
+
+    if (this.finally) {
+        res += this.finally;
+    }
+
+    return res;
+}
+
+function CatchClause() {
+    return "catch (" + this.param + ") " + spacesIfNeeded(this.body);
+}
+
+function ArrowFunctionExpression() {
+    let res = "";
+
+    let needFunctionBrackets = false;
+    if (this.id) {
+        needFunctionBrackets = true;
+        res += this.id + " ";
+    }
+
+    if (!this.params || this.params.length == 0 || this.params.length > 1) {
+        needFunctionBrackets = true;
+    }
+
+    if (needFunctionBrackets) { 
+        res += "(";
+    }
+
+    if (this.params && this.params.length > 0) {
+        _.each(this.params, (arg, idx) => {
+            res += arg + (idx < this.params.length - 1 ? ", " : "");
+        });
+    }
+
+    if (needBrackets) {
+        res += ")";
+    } 
+    res += " => " + spacesIfNeeded(this.body);
+    
+    return res;
+}
+
+function BooleanLiteral() {
+    return this.value ? "true" : "false";
+}
+
+function TemplateLiteral() {
+    let res = "";
+
+    res += "`";
+    _.each(this.quasis, (node, idx) =>{
+        res += node;
+        if (!node.tail) {
+            res += "${" + this.expressions[idx] + "}";
+        } 
+    });
+    res += "`";
+
+    return res;
+}
+
+function TemplateElement() {
+    return this.value.raw;
+}
+
+function ForInStatement() {
+    let res = prependNewLineIfNeeded();
+    res += `for (${this.left} in ${this.right}) ${spacesIfNeeded(this.body)}`;
+    
+    return res;
+}
+
+function WhileStatement() {
+    let res = prependNewLineIfNeeded();
+    res += `while (${this.test})\n${spacesIfNeeded(this.body)}`;
+    
+    return res;
+}
+
+function EmptyStatement() {
+    // TODO: Check if correct
+    return "<<<[[[;]]]>>>";
+}
+                
+function ExportDefaultDeclaration() {
+    let res = prependNewLineIfNeeded();
+    res += `export default ${this.declaration}`;
+    
+    return res;
+}
+
+function ClassExpression() {
+    return ClassDeclaration();
+}
+
+function ClassDeclaration() {
+    return `class ${this.id || ""} ${this.superClass ? " extends " + this.superClass : ""} ${this.body}`;
+}
+               
+function ClassMethod() {
+    let res = prependNewLineIfNeeded();
+    let id = this.id || this.key;
+    res += spaces() + (id ? id + " " : "") + "(";
+    if (this.params.length > 0) {
+        _.each(this.params, (arg, idx) => {
+            res += arg + (idx < this.params.length - 1 ? ", " : "");
+        });
+    }
+    res += ") " + spacesIfNeeded(this.body);
+    res += "\n";
+    
+    return res;
+}
+
+function DebuggerStatement() {
+    return "debugger";
+}   
+
+function DoWhileStatement() {
+    return `do ${this.body} while (${this.test})`;
+}
+
+function LabeledStatement() {
+    return `${this.label}: ${this.body}`;
+}
+
+                
+function WithStatement() {
+    return `with (${this.object}) ${this.body}`;
+}
+
+function ObjectMethod() {
+    let res = prependNewLineIfNeeded();
+    let methodId = this.id || this.key;
+    res += this.kind + " " + (methodId ? methodId + " " : "") + "(";
+    if (this.params.length > 0) {
+        _.each(this.params, (arg, idx) => {
+            res += arg + (idx < this.params.length - 1 ? ", " : "");
+        });
+    }
+    res += ") " + spacesIfNeeded(this.body);
+    res += "\n";
+    
+    return res;
+}
+                
+function RestElement() {
+    return `...${this.argument}`;
+}
+                
+function ExportAllDeclaration() {
+    return `export * from ${this.source}`;
+}
+
+ function BindExpression() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function TaggedTemplateExpression() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function DoExpression() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function MetaProperty() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function Super() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function RestProperty() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function SpreadProperty() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function AwaitExpression() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function YieldExpression() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function Decorator() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ForOfStatement() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ClassProperty() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ExportNamespaceSpecifier() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ExportDefaultSpecifier() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ExportNamespaceSpecifier() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ExportNamedDeclaration() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ExportSpecifier() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ImportDeclaration() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ImportNamespaceSpecifier() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ImportSpecifier() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ImportDefaultSpecifier() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function DeclareClass() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function FunctionTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function TypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function DeclareFunction() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function DeclareModule() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function DeclareTypeAlias() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function DeclareInterface() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function InterfaceExtends() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function InterfaceDeclaration() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function TypeAlias() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function TypeParameterDeclaration() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ExistentialTypeParam() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function TypeParameterInstantiation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ObjectTypeIndexer() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ObjectTypeProperty() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ObjectTypeCallProperty() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ObjectTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function QualifiedTypeIdentifier() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function GenericTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function TypeofTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function TupleTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function FunctionTypeParam() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function AnyTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function VoidTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function BooleanTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function MixedTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function NumberTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function StringTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function FunctionTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function StringLiteralTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function BooleanLiteralTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function NumericLiteralTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function NullLiteralTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ThisTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ArrayTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function NullableTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function IntersectionTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function UnionTypeAnnotation() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function TypeCastExpression() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function TypeCastExpression() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function ClassImplements() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function JSXIdentifier() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function JSXNamespacedName() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function JSXMemberExpression() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function JSXEmptyExpression() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function JSXExpressionContainer() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function JSXSpreadAttribute() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function JSXAttribute() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function JSXOpeningElement() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function JSXClosingElement() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
+ function JSXElement() {
+     return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
+ }
+ 
