@@ -5,6 +5,7 @@ const _ = require('lodash');
 const nodesHierarchy = [];
 const spacesPerLevel = 2;
 let level = 0;
+let _smc;
 
 Array.prototype.lastNth = function (n) {
     return this[this.length - ((n||0)+1)];
@@ -26,6 +27,7 @@ function spaces(_level) {
 }
 
 module.exports.setupNodePrototype = (ast, smc) => {
+    _smc = smc;
     ast.__proto__.toString = function () {
         nodesHierarchy.push(this);
         let res = "";
@@ -48,7 +50,7 @@ module.exports.setupNodePrototype = (ast, smc) => {
         if (wrapInParenthesis) {
             res += "(";
         }
-        let printMethod = this[this.type];
+        let printMethod = module.exports[this.type];
         if (printMethod) {
             res += printMethod.call(this);
         } else {
@@ -125,7 +127,7 @@ function prependNewLineIfNeeded() {
     return res;
 }
 
-function VariableDeclaration() {
+module.exports.VariableDeclaration = function() {
     let res = "";
     res += this.kind + " ";
     _.each(this.declarations, (node, idx) => {
@@ -136,7 +138,7 @@ function VariableDeclaration() {
     return res;
 }
 
-function VariableDeclarator() {
+module.exports.VariableDeclarator = function() {
     let res = "";
     res += this.id.toString();
     
@@ -147,10 +149,10 @@ function VariableDeclarator() {
     return res;
 }
 
-function Identifier() {
+module.exports.Identifier = function() {
     let name = this.name;
-    if (smc) {
-        let origLoc = smc.originalPositionFor({line: this.loc.start.line, column: this.loc.start.column});
+    if (_smc) {
+        let origLoc = _smc.originalPositionFor({line: this.loc.start.line, column: this.loc.start.column});
         if (origLoc && origLoc.name) {
             name = origLoc.name;
         }
@@ -158,23 +160,23 @@ function Identifier() {
     return name;
 }
 
-function CallExpression() {
+module.exports.CallExpression = function() {
     return RenderCallExpression(this);
 }
 
-function NumericLiteral() {
-    return StringLiteral();
+module.exports.NumericLiteral = function() {
+    return module.exports.StringLiteral.call(this);
 }
 
-function StringLiteral() {
+module.exports.StringLiteral = function() {
     return this.extra.raw;
 }
 
-function ExpressionStatement() {
+module.exports.ExpressionStatement = function() {
     return this.expression;
 }
 
-function SequenceExpression() {
+module.exports.SequenceExpression = function() {
     let res = "";
 
     if (this.expressions && this.expressions.length > 0) {
@@ -189,7 +191,7 @@ function SequenceExpression() {
     return res;
 }
 
-function MemberExpression() {
+module.exports.MemberExpression = function() {
     let res = "";
     res += this.object;
 
@@ -202,11 +204,11 @@ function MemberExpression() {
     return res;
 }
 
-function ObjectExpression() {
-    return ObjectPattern();
+module.exports.ObjectExpression = function() {
+    return module.exports.ObjectPattern.call(this);
 }
 
-function ObjectPattern() {
+module.exports.ObjectPattern = function() {
     let res = "";
 
     res += "{";
@@ -226,7 +228,7 @@ function ObjectPattern() {
     return res;
 }
 
-function ObjectProperty() {
+module.exports.ObjectProperty = function() {
     let id = this.key;  
 
     if (this.computed) {
@@ -235,15 +237,15 @@ function ObjectProperty() {
     return id + ": " + this.value;
 }
                 
-function NewExpression() {
+module.exports.NewExpression = function() {
     return "new " + RenderCallExpression(this); 
 }
 
-function ArrayExpression() {
-    return ArrayPattern();
+module.exports.ArrayExpression = function() {
+    return module.exports.ArrayPattern.call(this);
 }
 
-function ArrayPattern() {
+module.exports.ArrayPattern = function() {
     let res = "";
 
     res += "[";
@@ -263,7 +265,7 @@ function ArrayPattern() {
     return res;
 }
 
-function ForStatement() {
+module.exports.ForStatement = function() {
     let res = "";
 
     res += prependNewLineIfNeeded();
@@ -276,15 +278,15 @@ function ForStatement() {
     return res;
 }
 
-function BinaryExpression() {
-    return LogicalExpression();
+module.exports.BinaryExpression = function() {
+    return module.exports.LogicalExpression.call(this);
 }
 
-function LogicalExpression() {
+module.exports.LogicalExpression = function() {
     return this.left + " " + this.operator + " " + this.right;
 }
 
-function UpdateExpression() {
+module.exports.UpdateExpression = function() {
     let needBracketsForUpdate = !!(this.extra && this.extra.parenthesizedArgument);
     if (this.prefix) {
         return (needBracketsForUpdate ? "(" : "") + this.operator + this.argument + (needBracketsForUpdate ? ")" : "");
@@ -293,26 +295,26 @@ function UpdateExpression() {
     }
 }
 
-function File() {
+module.exports.File = function() {
     return this.program;
 }
 
-function Program() {
-    return BlockStatement();   
+module.exports.Program = function() {
+    return module.exports.BlockStatement.call(this);   
 }
 
-function ClassBody() {
-    return BlockStatement();
+module.exports.ClassBody = function() {
+    return module.exports.BlockStatement.call(this);
 }
 
-function BlockStatement() {
+module.exports.BlockStatement = function() {
     let res = "";
 
     if (this.type != "Program") {
         res += "{\n";
         level++;
     }
-    if (this.type != "ClassBody" && this.directives.length > 0) {
+    if (this.type != "ClassBody" && this.directives && this.directives.length > 0) {
         _.each(this.directives, arg => {
             res += spaces() + arg + "\n";
         });
@@ -330,7 +332,7 @@ function BlockStatement() {
     return res;
 }
 
-function IfStatement() {
+module.exports.IfStatement = function() {
     let res = "";
 
     res += prependNewLineIfNeeded();
@@ -343,11 +345,11 @@ function IfStatement() {
     return res;
 }
 
-function FunctionExpression() {
-    return FunctionDeclaration();
+module.exports.FunctionExpression = function() {
+    return module.exports.FunctionDeclaration.call(this);
 }
 
-function FunctionDeclaration() {
+module.exports.FunctionDeclaration = function() {
     let res = "";
 
     if (this.type == "FunctionDeclaration") {
@@ -368,31 +370,31 @@ function FunctionDeclaration() {
     return res;
 }
 
-function AssignmentPattern() {
-    return AssignmentExpression();
+module.exports.AssignmentPattern = function() {
+    return module.exports.AssignmentExpression.call(this);
 }
 
-function AssignmentExpression() {
+module.exports.AssignmentExpression = function() {
     return `${this.left} ${this.operator || "="} ${this.right}`;
 }
 
-function NullLiteral() {
+module.exports.NullLiteral = function() {
     return "null";
 }
 
-function Directive() {
+module.exports.Directive = function() {
     return this.value + ";";
 }
 
-function DirectiveLiteral() {
+module.exports.DirectiveLiteral = function() {
     return this.extra.raw;
 }
 
-function ReturnStatement() {
+module.exports.ReturnStatement = function() {
     return "return " + (this.argument ? this.argument : "");
 }
 
-function UnaryExpression() {
+module.exports.UnaryExpression = function() {
     let needBrackets = !!(this.extra && this.extra.parenthesizedArgument && !(this.argument.extra && this.argument.extra.parenthesized));
     if (this.prefix) {
         return this.operator + (this.operator.length > 1 ? " " : "") + (needBrackets ? "(" : "") + this.argument  + (needBrackets ? ")" : "");
@@ -401,19 +403,19 @@ function UnaryExpression() {
     }
 }
 
-function ConditionalExpression() {
+module.exports.ConditionalExpression = function() {
     return this.test + " ? " + this.consequent + " : " + this.alternate;
 }
 
-function ThisExpression() {
+module.exports.ThisExpression = function() {
     return "this";
 }
 
-function RegExpLiteral() {
+module.exports.RegExpLiteral = function() {
     return this.extra.raw;
 }
 
-function SwitchCase() {
+module.exports.SwitchCase = function() {
     let res = "";
 
     if (this.test) {
@@ -433,7 +435,7 @@ function SwitchCase() {
     return res;
 }
                 
-function SwitchStatement() {
+module.exports.SwitchStatement = function() {
     let res = "";
 
     res += prependNewLineIfNeeded();
@@ -450,19 +452,19 @@ function SwitchStatement() {
     return res;
 }
 
-function BreakStatement() {
+module.exports.BreakStatement = function() {
     return `break  ${this.label || ""}`;
 }
 
-function ContinueStatement() {
+module.exports.ContinueStatement = function() {
     return `continue ${this.label || ""}`;
 }
 
-function ThrowStatement() {
+module.exports.ThrowStatement = function() {
     return "throw " + this.argument;
 }
 
-function TryStatement() {
+module.exports.TryStatement = function() {
     let res = "";
 
     res += "try " + this.block;
@@ -484,11 +486,11 @@ function TryStatement() {
     return res;
 }
 
-function CatchClause() {
+module.exports.CatchClause = function() {
     return "catch (" + this.param + ") " + spacesIfNeeded(this.body);
 }
 
-function ArrowFunctionExpression() {
+module.exports.ArrowFunctionExpression = function() {
     let res = "";
 
     let needFunctionBrackets = false;
@@ -511,7 +513,7 @@ function ArrowFunctionExpression() {
         });
     }
 
-    if (needBrackets) {
+    if (needFunctionBrackets) {
         res += ")";
     } 
     res += " => " + spacesIfNeeded(this.body);
@@ -519,11 +521,11 @@ function ArrowFunctionExpression() {
     return res;
 }
 
-function BooleanLiteral() {
+module.exports.BooleanLiteral = function() {
     return this.value ? "true" : "false";
 }
 
-function TemplateLiteral() {
+module.exports.TemplateLiteral = function() {
     let res = "";
 
     res += "`";
@@ -538,45 +540,45 @@ function TemplateLiteral() {
     return res;
 }
 
-function TemplateElement() {
+module.exports.TemplateElement = function() {
     return this.value.raw;
 }
 
-function ForInStatement() {
+module.exports.ForInStatement = function() {
     let res = prependNewLineIfNeeded();
     res += `for (${this.left} in ${this.right}) ${spacesIfNeeded(this.body)}`;
     
     return res;
 }
 
-function WhileStatement() {
+module.exports.WhileStatement = function() {
     let res = prependNewLineIfNeeded();
     res += `while (${this.test})\n${spacesIfNeeded(this.body)}`;
     
     return res;
 }
 
-function EmptyStatement() {
+module.exports.EmptyStatement = function() {
     // TODO: Check if correct
     return "<<<[[[;]]]>>>";
 }
                 
-function ExportDefaultDeclaration() {
+module.exports.ExportDefaultDeclaration = function() {
     let res = prependNewLineIfNeeded();
     res += `export default ${this.declaration}`;
     
     return res;
 }
 
-function ClassExpression() {
-    return ClassDeclaration();
+module.exports.ClassExpression = function() {
+    return module.exports.ClassDeclaration.call(this);
 }
 
-function ClassDeclaration() {
+module.exports.ClassDeclaration = function() {
     return `class ${this.id || ""} ${this.superClass ? " extends " + this.superClass : ""} ${this.body}`;
 }
                
-function ClassMethod() {
+module.exports.ClassMethod = function() {
     let res = prependNewLineIfNeeded();
     let id = this.id || this.key;
     res += spaces() + (id ? id + " " : "") + "(";
@@ -591,24 +593,24 @@ function ClassMethod() {
     return res;
 }
 
-function DebuggerStatement() {
+module.exports.DebuggerStatement = function() {
     return "debugger";
 }   
 
-function DoWhileStatement() {
+module.exports.DoWhileStatement = function() {
     return `do ${this.body} while (${this.test})`;
 }
 
-function LabeledStatement() {
+module.exports.LabeledStatement = function() {
     return `${this.label}: ${this.body}`;
 }
 
                 
-function WithStatement() {
+module.exports.WithStatement = function() {
     return `with (${this.object}) ${this.body}`;
 }
 
-function ObjectMethod() {
+module.exports.ObjectMethod = function() {
     let res = prependNewLineIfNeeded();
     let methodId = this.id || this.key;
     res += this.kind + " " + (methodId ? methodId + " " : "") + "(";
@@ -623,299 +625,299 @@ function ObjectMethod() {
     return res;
 }
                 
-function RestElement() {
+module.exports.RestElement = function() {
     return `...${this.argument}`;
 }
                 
-function ExportAllDeclaration() {
+module.exports.ExportAllDeclaration = function() {
     return `export * from ${this.source}`;
 }
 
- function BindExpression() {
+ module.exports.BindExpression = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function TaggedTemplateExpression() {
+ module.exports.TaggedTemplateExpression = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function DoExpression() {
+ module.exports.DoExpression = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function MetaProperty() {
+ module.exports.MetaProperty = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function Super() {
+ module.exports.Super = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function RestProperty() {
+ module.exports.RestProperty = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function SpreadProperty() {
+ module.exports.SpreadProperty = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function AwaitExpression() {
+ module.exports.AwaitExpression = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function YieldExpression() {
+ module.exports.YieldExpression = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function Decorator() {
+ module.exports.Decorator = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ForOfStatement() {
+ module.exports.ForOfStatement = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ClassProperty() {
+ module.exports.ClassProperty = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ExportNamespaceSpecifier() {
+ module.exports.ExportNamespaceSpecifier = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ExportDefaultSpecifier() {
+ module.exports.ExportDefaultSpecifier = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ExportNamespaceSpecifier() {
+ module.exports.ExportNamespaceSpecifier = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ExportNamedDeclaration() {
+ module.exports.ExportNamedDeclaration = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ExportSpecifier() {
+ module.exports.ExportSpecifier = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ImportDeclaration() {
+ module.exports.ImportDeclaration = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ImportNamespaceSpecifier() {
+ module.exports.ImportNamespaceSpecifier = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ImportSpecifier() {
+ module.exports.ImportSpecifier = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ImportDefaultSpecifier() {
+ module.exports.ImportDefaultSpecifier = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function DeclareClass() {
+ module.exports.DeclareClass = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function FunctionTypeAnnotation() {
+ module.exports.FunctionTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function TypeAnnotation() {
+ module.exports.TypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function DeclareFunction() {
+ module.exports.DeclareFunction = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function DeclareModule() {
+ module.exports.DeclareModule = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function DeclareTypeAlias() {
+ module.exports.DeclareTypeAlias = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function DeclareInterface() {
+ module.exports.DeclareInterface = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function InterfaceExtends() {
+ module.exports.InterfaceExtends = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function InterfaceDeclaration() {
+ module.exports.InterfaceDeclaration = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function TypeAlias() {
+ module.exports.TypeAlias = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function TypeParameterDeclaration() {
+ module.exports.TypeParameterDeclaration = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ExistentialTypeParam() {
+ module.exports.ExistentialTypeParam = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function TypeParameterInstantiation() {
+ module.exports.TypeParameterInstantiation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ObjectTypeIndexer() {
+ module.exports.ObjectTypeIndexer = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ObjectTypeProperty() {
+ module.exports.ObjectTypeProperty = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ObjectTypeCallProperty() {
+ module.exports.ObjectTypeCallProperty = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ObjectTypeAnnotation() {
+ module.exports.ObjectTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function QualifiedTypeIdentifier() {
+ module.exports.QualifiedTypeIdentifier = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function GenericTypeAnnotation() {
+ module.exports.GenericTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function TypeofTypeAnnotation() {
+ module.exports.TypeofTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function TupleTypeAnnotation() {
+ module.exports.TupleTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function FunctionTypeParam() {
+ module.exports.FunctionTypeParam = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function AnyTypeAnnotation() {
+ module.exports.AnyTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function VoidTypeAnnotation() {
+ module.exports.VoidTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function BooleanTypeAnnotation() {
+ module.exports.BooleanTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function MixedTypeAnnotation() {
+ module.exports.MixedTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function NumberTypeAnnotation() {
+ module.exports.NumberTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function StringTypeAnnotation() {
+ module.exports.StringTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function FunctionTypeAnnotation() {
+ module.exports.FunctionTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function StringLiteralTypeAnnotation() {
+ module.exports.StringLiteralTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function BooleanLiteralTypeAnnotation() {
+ module.exports.BooleanLiteralTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function NumericLiteralTypeAnnotation() {
+ module.exports.NumericLiteralTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function NullLiteralTypeAnnotation() {
+ module.exports.NullLiteralTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ThisTypeAnnotation() {
+ module.exports.ThisTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ArrayTypeAnnotation() {
+ module.exports.ArrayTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function NullableTypeAnnotation() {
+ module.exports.NullableTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function IntersectionTypeAnnotation() {
+ module.exports.IntersectionTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function UnionTypeAnnotation() {
+ module.exports.UnionTypeAnnotation = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function TypeCastExpression() {
+ module.exports.TypeCastExpression = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function TypeCastExpression() {
+ module.exports.TypeCastExpression = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function ClassImplements() {
+ module.exports.ClassImplements = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function JSXIdentifier() {
+ module.exports.JSXIdentifier = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function JSXNamespacedName() {
+ module.exports.JSXNamespacedName = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function JSXMemberExpression() {
+ module.exports.JSXMemberExpression = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function JSXEmptyExpression() {
+ module.exports.JSXEmptyExpression = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function JSXExpressionContainer() {
+ module.exports.JSXExpressionContainer = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function JSXSpreadAttribute() {
+ module.exports.JSXSpreadAttribute = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function JSXAttribute() {
+ module.exports.JSXAttribute = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function JSXOpeningElement() {
+ module.exports.JSXOpeningElement = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function JSXClosingElement() {
+ module.exports.JSXClosingElement = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
- function JSXElement() {
+ module.exports.JSXElement = function() {
      return `<<<[[[ MISSED: ${JSON.stringify(this, null, '\t')} ]]]>>> `;
  }
  
