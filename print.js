@@ -9,13 +9,27 @@ const request = require('request');
 const SourceMapConsumer = require('source-map').SourceMapConsumer;
 // const unparse = require('./unparse');
 const print = require('babel-generator').default;
-
-console.log ("PRINT:");
-console.dir (print);
+const traverser = require("./traverser");
 
 String.prototype.last = function() {
   return this[this.length-1];  
 };
+
+function removeLocationInformation(node) {
+    if (!node) {
+        return;
+    }
+
+    console.log(`Cleaning ${node.type}...`);
+    
+    for (let prop in node) {
+        if (["loc", "start", "end"].indexOf(prop) > -1) {
+            node[prop] = null;
+            continue;
+        }
+    }
+}
+
 
 const processingFileName = fs.realpathSync(process.argv[2] || "data/simpleWorker.js");
 const code = fs.readFileSync(processingFileName, "utf8");
@@ -66,8 +80,9 @@ new Promise((resolve, reject) => {
     ]
     });
 
-//    unparse.setupNodePrototype(ast, smc);
-    const outputFilePath = `${processingFileName}.out`;
+    traverser.traverse(ast, removeLocationInformation);
+    // unparse.setupNodePrototype(ast, smc);
+    const outputFilePath = `${processingFileName}.gen`;
     createAllFoldersInPath(outputFilePath);
     let res = print(ast, {}, "");
     fs.writeFile(outputFilePath, res.code.toString(), err => {

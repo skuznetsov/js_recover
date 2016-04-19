@@ -3,7 +3,7 @@
 const _ = require('lodash');
 
 const nodesHierarchy = [];
-const spacesPerLevel = 4;
+const spacesPerLevel = 2;
 let level = 0;
 
 Array.prototype.lastNth = function (n) {
