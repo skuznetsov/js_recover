@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --harmony
 
 "use strict";
 
@@ -7,7 +7,7 @@ const parser = require('babylon');
 const _ = require('lodash');
 const request = require('request');
 const SourceMapConsumer = require('source-map').SourceMapConsumer;
-const unparse = require('./unparse');
+const print = require('./jsgen').default;
 
 String.prototype.last = function() {
   return this[this.length-1];  
@@ -62,10 +62,11 @@ new Promise((resolve, reject) => {
     ]
     });
 
-    unparse.setupNodePrototype(ast, smc);
+    // unparse.setupNodePrototype(ast, smc);
     const outputFilePath = `${processingFileName}.out`;
     createAllFoldersInPath(outputFilePath);
-    fs.writeFile(outputFilePath, ast.toString(), err => {
+    let res = print(ast, {}, "");
+    fs.writeFile(outputFilePath, res.code, err => {
         if (err) {
             console.log(`ERROR: Cannot save into ${outputFilePath}`);
             throw err;
