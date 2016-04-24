@@ -1,16 +1,14 @@
 "use strict";
 
-var _interopRequireWildcard = require("babel-runtime/helpers/interop-require-wildcard")["default"];
+module.exports = {
+  _params: _params,
+  _method: _method,
+  FunctionExpression: FunctionExpression,
+  ArrowFunctionExpression: ArrowFunctionExpression,
+  FunctionDeclaration: FunctionExpression
+};
 
-exports.__esModule = true;
-exports._params = _params;
-exports._method = _method;
-exports.FunctionExpression = FunctionExpression;
-exports.ArrowFunctionExpression = ArrowFunctionExpression;
-
-var _babelTypes = require("babel-types");
-
-var t = _interopRequireWildcard(_babelTypes);
+const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
 
 function _params(node) {
   // istanbul ignore next
@@ -78,7 +76,6 @@ function FunctionExpression(node) {
   this.print(node.body, node);
 }
 
-exports.FunctionDeclaration = FunctionExpression;
 
 function ArrowFunctionExpression(node) {
   if (node.async) this.push("async ");

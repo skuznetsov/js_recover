@@ -1,10 +1,12 @@
 "use strict";
 
-exports.__esModule = true;
-exports.ClassDeclaration = ClassDeclaration;
-exports.ClassBody = ClassBody;
-exports.ClassProperty = ClassProperty;
-exports.ClassMethod = ClassMethod;
+module.exports = {
+  ClassDeclaration: ClassDeclaration,
+  ClassBody: ClassBody,
+  ClassProperty: ClassProperty,
+  ClassMethod: ClassMethod,
+  ClassExpression: ClassDeclaration
+};
 
 function ClassDeclaration(node) {
   this.printJoin(node.decorators, node, { separator: "" });
@@ -31,8 +33,6 @@ function ClassDeclaration(node) {
   this.space();
   this.print(node.body, node);
 }
-
-exports.ClassExpression = ClassDeclaration;
 
 function ClassBody(node) {
   this.push("{");

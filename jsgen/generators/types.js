@@ -3,25 +3,27 @@
 
 "use strict";
 
-var _interopRequireWildcard = require("babel-runtime/helpers/interop-require-wildcard")["default"];
+module.exports = {
+  Identifier: Identifier,
+  RestElement: RestElement,
+  ObjectExpression: ObjectExpression,
+  ObjectMethod: ObjectMethod,
+  ObjectProperty: ObjectProperty,
+  ArrayExpression: ArrayExpression,
+  RegExpLiteral: RegExpLiteral,
+  BooleanLiteral: BooleanLiteral,
+  NullLiteral: NullLiteral,
+  NumericLiteral: NumericLiteral,
+  StringLiteral: StringLiteral,
+  _stringLiteral: _stringLiteral,
+  SpreadElement: RestElement,
+  SpreadProperty: RestElement,
+  RestProperty: RestElement,
+  ObjectPattern: ObjectExpression,
+  ArrayPattern: ArrayExpression
+};
 
-exports.__esModule = true;
-exports.Identifier = Identifier;
-exports.RestElement = RestElement;
-exports.ObjectExpression = ObjectExpression;
-exports.ObjectMethod = ObjectMethod;
-exports.ObjectProperty = ObjectProperty;
-exports.ArrayExpression = ArrayExpression;
-exports.RegExpLiteral = RegExpLiteral;
-exports.BooleanLiteral = BooleanLiteral;
-exports.NullLiteral = NullLiteral;
-exports.NumericLiteral = NumericLiteral;
-exports.StringLiteral = StringLiteral;
-exports._stringLiteral = _stringLiteral;
-
-var _babelTypes = require("babel-types");
-
-var t = _interopRequireWildcard(_babelTypes);
+const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
 
 function Identifier(node) {
   // FIXME: We hang variance off Identifer to support Flow's def-site variance.
@@ -42,10 +44,6 @@ function RestElement(node) {
   this.print(node.argument, node);
 }
 
-exports.SpreadElement = RestElement;
-exports.SpreadProperty = RestElement;
-exports.RestProperty = RestElement;
-
 function ObjectExpression(node) {
   var props = node.properties;
 
@@ -60,8 +58,6 @@ function ObjectExpression(node) {
 
   this.push("}");
 }
-
-exports.ObjectPattern = ObjectExpression;
 
 function ObjectMethod(node) {
   this.printJoin(node.decorators, node, { separator: "" });
@@ -120,8 +116,6 @@ function ArrayExpression(node) {
 
   this.push("]");
 }
-
-exports.ArrayPattern = ArrayExpression;
 
 function RegExpLiteral(node) {
   this.push("/" + node.pattern + "/" + node.flags);

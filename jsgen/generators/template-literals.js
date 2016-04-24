@@ -1,9 +1,10 @@
 "use strict";
 
-exports.__esModule = true;
-exports.TaggedTemplateExpression = TaggedTemplateExpression;
-exports.TemplateElement = TemplateElement;
-exports.TemplateLiteral = TemplateLiteral;
+module.exports = {
+  TaggedTemplateExpression: TaggedTemplateExpression,
+  TemplateElement: TemplateElement,
+  TemplateLiteral: TemplateLiteral
+};
 
 function TaggedTemplateExpression(node) {
   this.print(node.tag, node);

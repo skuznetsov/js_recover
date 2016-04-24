@@ -9,7 +9,7 @@ const request = require('request');
 const SourceMapConsumer = require('source-map').SourceMapConsumer;
 // const unparse = require('./unparse');
 const print = require('babel-generator').default;
-const traverser = require("./traverser");
+const traverse = require("./traverser").traverse;
 
 String.prototype.last = function() {
   return this[this.length-1];  
@@ -80,7 +80,7 @@ new Promise((resolve, reject) => {
     ]
     });
 
-    traverser.traverse(ast, removeLocationInformation);
+    traverse(ast, removeLocationInformation);
     // unparse.setupNodePrototype(ast, smc);
     const outputFilePath = `${processingFileName}.gen`;
     createAllFoldersInPath(outputFilePath);

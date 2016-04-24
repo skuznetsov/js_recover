@@ -1,22 +1,19 @@
 "use strict";
 
-var _interopRequireWildcard = require("babel-runtime/helpers/interop-require-wildcard")["default"];
+module.exports = {
+  ImportSpecifier: ImportSpecifier,
+  ImportDefaultSpecifier: ImportDefaultSpecifier,
+  ExportDefaultSpecifier: ExportDefaultSpecifier,
+  ExportSpecifier: ExportSpecifier,
+  ExportNamespaceSpecifier: ExportNamespaceSpecifier,
+  ExportAllDeclaration: ExportAllDeclaration,
+  ExportNamedDeclaration: ExportNamedDeclaration,
+  ExportDefaultDeclaration: ExportDefaultDeclaration,
+  ImportDeclaration: ImportDeclaration,
+  ImportNamespaceSpecifier: ImportNamespaceSpecifier
+};
 
-exports.__esModule = true;
-exports.ImportSpecifier = ImportSpecifier;
-exports.ImportDefaultSpecifier = ImportDefaultSpecifier;
-exports.ExportDefaultSpecifier = ExportDefaultSpecifier;
-exports.ExportSpecifier = ExportSpecifier;
-exports.ExportNamespaceSpecifier = ExportNamespaceSpecifier;
-exports.ExportAllDeclaration = ExportAllDeclaration;
-exports.ExportNamedDeclaration = ExportNamedDeclaration;
-exports.ExportDefaultDeclaration = ExportDefaultDeclaration;
-exports.ImportDeclaration = ImportDeclaration;
-exports.ImportNamespaceSpecifier = ImportNamespaceSpecifier;
-
-var _babelTypes = require("babel-types");
-
-var t = _interopRequireWildcard(_babelTypes);
+const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
 
 function ImportSpecifier(node) {
   this.print(node.imported, node);

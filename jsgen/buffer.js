@@ -213,7 +213,7 @@ Buffer.prototype.newline = function newline(i, removeLast) {
 
     this.removeLast(" ");
     this._removeSpacesAfterLastNewline();
-    this._push(_repeating2["default"]("\n", i));
+    this._push(repeating("\n", i));
 };
 
 /**

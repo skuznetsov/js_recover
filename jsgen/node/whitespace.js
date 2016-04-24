@@ -1,13 +1,7 @@
 "use strict";
 
-var _interopRequireDefault = require("babel-runtime/helpers/interop-require-default")["default"];
-
-var _interopRequireWildcard = require("babel-runtime/helpers/interop-require-wildcard")["default"];
-
 const _ = require("lodash");
-var _babelTypes = require("babel-types");
-
-var t = _interopRequireWildcard(_babelTypes);
+const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
 
 /**
  * Crawl a node to test if it contains a CallExpression, a Function, or a Helper.
@@ -64,7 +58,7 @@ function isType(node) {
  * Tests for node types that need whitespace.
  */
 
-exports.nodes = {
+module.exports.nodes = {
 
   /**
    * Test if AssignmentExpression needs whitespace.
@@ -168,7 +162,7 @@ exports.nodes = {
  * Test if Property or SpreadProperty needs whitespace.
  */
 
-exports.nodes.ObjectProperty = exports.nodes.ObjectMethod = exports.nodes.SpreadProperty = function (node, parent) {
+module.exports.nodes.ObjectProperty = module.exports.nodes.ObjectMethod = module.exports.nodes.SpreadProperty = function (node, parent) {
   if (parent.properties[0] === node) {
     return {
       before: true
@@ -180,7 +174,7 @@ exports.nodes.ObjectProperty = exports.nodes.ObjectMethod = exports.nodes.Spread
  * Returns lists from node types that need whitespace.
  */
 
-exports.list = {
+module.exports.list = {
 
   /**
    * Return VariableDeclaration declarations init properties.

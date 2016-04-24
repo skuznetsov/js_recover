@@ -1,12 +1,13 @@
 "use strict";
 
-exports.__esModule = true;
-exports.File = File;
-exports.Program = Program;
-exports.BlockStatement = BlockStatement;
-exports.Noop = Noop;
-exports.Directive = Directive;
-exports.DirectiveLiteral = DirectiveLiteral;
+module.exports = {
+  File: File,
+  Program: Program,
+  BlockStatement: BlockStatement,
+  Noop: Noop,
+  Directive: Directive,
+  DirectiveLiteral: DirectiveLiteral
+};
 
 function File(node) {
   this.print(node.program, node);

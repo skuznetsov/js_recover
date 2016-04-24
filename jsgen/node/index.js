@@ -1,35 +1,24 @@
 "use strict";
 
-var _Object$keys = require("babel-runtime/core-js/object/keys")["default"];
+const ObjectКeys = require("babel-runtime/core-js/object/keys").default;
 
-var _interopRequireDefault = require("babel-runtime/helpers/interop-require-default")["default"];
+module.exports = {
+  isUserWhitespacable: isUserWhitespacable,
+  needsWhitespace: needsWhitespace,
+  needsWhitespaceBefore: needsWhitespaceBefore,
+  needsWhitespaceAfter: needsWhitespaceAfter,
+  needsParens: needsParens
+};
 
-var _interopRequireWildcard = require("babel-runtime/helpers/interop-require-wildcard")["default"];
-
-exports.__esModule = true;
-exports.isUserWhitespacable = isUserWhitespacable;
-exports.needsWhitespace = needsWhitespace;
-exports.needsWhitespaceBefore = needsWhitespaceBefore;
-exports.needsWhitespaceAfter = needsWhitespaceAfter;
-exports.needsParens = needsParens;
-
-var _whitespace = require("./whitespace");
-
-var _whitespace2 = _interopRequireDefault(_whitespace);
-
-var _parentheses = require("./parentheses");
-
-var parens = _interopRequireWildcard(_parentheses);
-
-var _babelTypes = require("babel-types");
-
-var t = _interopRequireWildcard(_babelTypes);
+const whitespace = require("./whitespace");
+const parens = require("./parentheses");
+const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
 
 function find(obj, node, parent, printStack) {
   if (!obj) return;
   var result = undefined;
 
-  var types = _Object$keys(obj);
+  var types = ObjectКeys(obj);
   for (var i = 0; i < types.length; i++) {
     var type = types[i];
 
@@ -66,10 +55,10 @@ function needsWhitespace(node, parent, type) {
     node = node.expression;
   }
 
-  var linesInfo = find(_whitespace2["default"].nodes, node, parent);
+  var linesInfo = find(whitespace.nodes, node, parent);
 
   if (!linesInfo) {
-    var items = find(_whitespace2["default"].list, node, parent);
+    var items = find(whitespace.list, node, parent);
     if (items) {
       for (var i = 0; i < items.length; i++) {
         linesInfo = needsWhitespace(items[i], node, type);

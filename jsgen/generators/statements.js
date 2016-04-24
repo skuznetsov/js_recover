@@ -1,31 +1,29 @@
 "use strict";
 
-var _interopRequireDefault = require("babel-runtime/helpers/interop-require-default")["default"];
+module.exports = {
+  WithStatement: WithStatement,
+  IfStatement: IfStatement,
+  ForStatement: ForStatement,
+  WhileStatement: WhileStatement,
+  DoWhileStatement: DoWhileStatement,
+  LabeledStatement: LabeledStatement,
+  TryStatement: TryStatement,
+  CatchClause: CatchClause,
+  SwitchStatement: SwitchStatement,
+  SwitchCase: SwitchCase,
+  DebuggerStatement: DebuggerStatement,
+  VariableDeclaration: VariableDeclaration,
+  VariableDeclarator: VariableDeclarator,
+  ForInStatement: buildForXStatement("in"),
+  ForOfStatement: buildForXStatement("of"),
+  ContinueStatement: buildLabelStatement("continue"),
+  ReturnStatement: buildLabelStatement("return", "argument"),
+  BreakStatement: buildLabelStatement("break"),
+  ThrowStatement: buildLabelStatement("throw", "argument")
+};
 
-var _interopRequireWildcard = require("babel-runtime/helpers/interop-require-wildcard")["default"];
-
-exports.__esModule = true;
-exports.WithStatement = WithStatement;
-exports.IfStatement = IfStatement;
-exports.ForStatement = ForStatement;
-exports.WhileStatement = WhileStatement;
-exports.DoWhileStatement = DoWhileStatement;
-exports.LabeledStatement = LabeledStatement;
-exports.TryStatement = TryStatement;
-exports.CatchClause = CatchClause;
-exports.SwitchStatement = SwitchStatement;
-exports.SwitchCase = SwitchCase;
-exports.DebuggerStatement = DebuggerStatement;
-exports.VariableDeclaration = VariableDeclaration;
-exports.VariableDeclarator = VariableDeclarator;
-
-var _repeating = require("repeating");
-
-var _repeating2 = _interopRequireDefault(_repeating);
-
-var _babelTypes = require("babel-types");
-
-var t = _interopRequireWildcard(_babelTypes);
+const repeating = require("repeating");
+const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
 
 var NON_ALPHABETIC_UNARY_OPERATORS = t.UPDATE_OPERATORS.concat(t.NUMBER_UNARY_OPERATORS).concat(["!"]);
 
@@ -104,7 +102,7 @@ function WhileStatement(node) {
   this.printBlock(node);
 }
 
-var buildForXStatement = function buildForXStatement(op) {
+function buildForXStatement(op) {
   return function (node) {
     this.keyword("for");
     this.push("(");
@@ -115,12 +113,6 @@ var buildForXStatement = function buildForXStatement(op) {
     this.printBlock(node);
   };
 };
-
-var ForInStatement = buildForXStatement("in");
-exports.ForInStatement = ForInStatement;
-var ForOfStatement = buildForXStatement("of");
-
-exports.ForOfStatement = ForOfStatement;
 
 function DoWhileStatement(node) {
   this.push("do ");
@@ -152,16 +144,6 @@ function buildLabelStatement(prefix) {
     this.semicolon();
   };
 }
-
-var ContinueStatement = buildLabelStatement("continue");
-exports.ContinueStatement = ContinueStatement;
-var ReturnStatement = buildLabelStatement("return", "argument");
-exports.ReturnStatement = ReturnStatement;
-var BreakStatement = buildLabelStatement("break");
-exports.BreakStatement = BreakStatement;
-var ThrowStatement = buildLabelStatement("throw", "argument");
-
-exports.ThrowStatement = ThrowStatement;
 
 function LabeledStatement(node) {
   this.print(node.label, node);
@@ -267,7 +249,7 @@ function VariableDeclaration(node, parent) {
 
   var sep = undefined;
   if (!this.format.compact && !this.format.concise && hasInits && !this.format.retainLines) {
-    sep = ",\n" + _repeating2["default"](" ", node.kind.length + 1);
+    sep = ",\n" + repeating(" ", node.kind.length + 1);
   }
 
   //

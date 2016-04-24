@@ -2,50 +2,53 @@
 
 "use strict";
 
-var _interopRequireWildcard = require("babel-runtime/helpers/interop-require-wildcard")["default"];
+const _types = require("./types");
 
-exports.__esModule = true;
-exports.AnyTypeAnnotation = AnyTypeAnnotation;
-exports.ArrayTypeAnnotation = ArrayTypeAnnotation;
-exports.BooleanTypeAnnotation = BooleanTypeAnnotation;
-exports.BooleanLiteralTypeAnnotation = BooleanLiteralTypeAnnotation;
-exports.NullLiteralTypeAnnotation = NullLiteralTypeAnnotation;
-exports.DeclareClass = DeclareClass;
-exports.DeclareFunction = DeclareFunction;
-exports.DeclareInterface = DeclareInterface;
-exports.DeclareModule = DeclareModule;
-exports.DeclareTypeAlias = DeclareTypeAlias;
-exports.DeclareVariable = DeclareVariable;
-exports.ExistentialTypeParam = ExistentialTypeParam;
-exports.FunctionTypeAnnotation = FunctionTypeAnnotation;
-exports.FunctionTypeParam = FunctionTypeParam;
-exports.InterfaceExtends = InterfaceExtends;
-exports._interfaceish = _interfaceish;
-exports.InterfaceDeclaration = InterfaceDeclaration;
-exports.IntersectionTypeAnnotation = IntersectionTypeAnnotation;
-exports.MixedTypeAnnotation = MixedTypeAnnotation;
-exports.NullableTypeAnnotation = NullableTypeAnnotation;
-exports.NumberTypeAnnotation = NumberTypeAnnotation;
-exports.StringLiteralTypeAnnotation = StringLiteralTypeAnnotation;
-exports.StringTypeAnnotation = StringTypeAnnotation;
-exports.ThisTypeAnnotation = ThisTypeAnnotation;
-exports.TupleTypeAnnotation = TupleTypeAnnotation;
-exports.TypeofTypeAnnotation = TypeofTypeAnnotation;
-exports.TypeAlias = TypeAlias;
-exports.TypeAnnotation = TypeAnnotation;
-exports.TypeParameterInstantiation = TypeParameterInstantiation;
-exports.ObjectTypeAnnotation = ObjectTypeAnnotation;
-exports.ObjectTypeCallProperty = ObjectTypeCallProperty;
-exports.ObjectTypeIndexer = ObjectTypeIndexer;
-exports.ObjectTypeProperty = ObjectTypeProperty;
-exports.QualifiedTypeIdentifier = QualifiedTypeIdentifier;
-exports.UnionTypeAnnotation = UnionTypeAnnotation;
-exports.TypeCastExpression = TypeCastExpression;
-exports.VoidTypeAnnotation = VoidTypeAnnotation;
+module.exports = {
+  AnyTypeAnnotation: AnyTypeAnnotation,
+  ArrayTypeAnnotation: ArrayTypeAnnotation,
+  BooleanTypeAnnotation: BooleanTypeAnnotation,
+  BooleanLiteralTypeAnnotation: BooleanLiteralTypeAnnotation,
+  NullLiteralTypeAnnotation: NullLiteralTypeAnnotation,
+  DeclareClass: DeclareClass,
+  DeclareFunction: DeclareFunction,
+  DeclareInterface: DeclareInterface,
+  DeclareModule: DeclareModule,
+  DeclareTypeAlias: DeclareTypeAlias,
+  DeclareVariable: DeclareVariable,
+  ExistentialTypeParam: ExistentialTypeParam,
+  FunctionTypeAnnotation: FunctionTypeAnnotation,
+  FunctionTypeParam: FunctionTypeParam,
+  InterfaceExtends: InterfaceExtends,
+  _interfaceish: _interfaceish,
+  InterfaceDeclaration: InterfaceDeclaration,
+  IntersectionTypeAnnotation: IntersectionTypeAnnotation,
+  MixedTypeAnnotation: MixedTypeAnnotation,
+  NullableTypeAnnotation: NullableTypeAnnotation,
+  NumberTypeAnnotation: NumberTypeAnnotation,
+  StringLiteralTypeAnnotation: StringLiteralTypeAnnotation,
+  StringTypeAnnotation: StringTypeAnnotation,
+  ThisTypeAnnotation: ThisTypeAnnotation,
+  TupleTypeAnnotation: TupleTypeAnnotation,
+  TypeofTypeAnnotation: TypeofTypeAnnotation,
+  TypeAlias: TypeAlias,
+  TypeAnnotation: TypeAnnotation,
+  TypeParameterInstantiation: TypeParameterInstantiation,
+  ObjectTypeAnnotation: ObjectTypeAnnotation,
+  ObjectTypeCallProperty: ObjectTypeCallProperty,
+  ObjectTypeIndexer: ObjectTypeIndexer,
+  ObjectTypeProperty: ObjectTypeProperty,
+  QualifiedTypeIdentifier: QualifiedTypeIdentifier,
+  UnionTypeAnnotation: UnionTypeAnnotation,
+  TypeCastExpression: TypeCastExpression,
+  VoidTypeAnnotation: VoidTypeAnnotation,
+  TypeParameterDeclaration: TypeParameterInstantiation,
+  NumericLiteralTypeAnnotation: _types.NumericLiteral,
+  ClassImplements: InterfaceExtends,
+  GenericTypeAnnotation: InterfaceExtends
+};
 
-var _babelTypes = require("babel-types");
-
-var t = _interopRequireWildcard(_babelTypes);
+const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
 
 function AnyTypeAnnotation() {
   this.push("any");
@@ -150,8 +153,6 @@ function InterfaceExtends(node) {
   this.print(node.typeParameters, node);
 }
 
-exports.ClassImplements = InterfaceExtends;
-exports.GenericTypeAnnotation = InterfaceExtends;
 
 function _interfaceish(node) {
   this.print(node.id, node);
@@ -185,10 +186,6 @@ function NullableTypeAnnotation(node) {
   this.push("?");
   this.print(node.typeAnnotation, node);
 }
-
-var _types = require("./types");
-
-exports.NumericLiteralTypeAnnotation = _types.NumericLiteral;
 
 function NumberTypeAnnotation() {
   this.push("number");
@@ -250,7 +247,6 @@ function TypeParameterInstantiation(node) {
   this.push(">");
 }
 
-exports.TypeParameterDeclaration = TypeParameterInstantiation;
 
 function ObjectTypeAnnotation(node) {
   // istanbul ignore next

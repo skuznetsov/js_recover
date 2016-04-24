@@ -25,7 +25,7 @@ function Printer() {
         args[_key] = arguments[_key];
     }
 
-    _Buffer.call.apply(_Buffer, [this].concat(args));
+    Buffer.call.apply(Buffer, [this].concat(args));
     this.insideAux = false;
     this.printAuxAfterOnNextUserNode = false;
     this._printStack = [];

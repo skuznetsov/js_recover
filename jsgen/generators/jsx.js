@@ -1,17 +1,18 @@
 "use strict";
 
-exports.__esModule = true;
-exports.JSXAttribute = JSXAttribute;
-exports.JSXIdentifier = JSXIdentifier;
-exports.JSXNamespacedName = JSXNamespacedName;
-exports.JSXMemberExpression = JSXMemberExpression;
-exports.JSXSpreadAttribute = JSXSpreadAttribute;
-exports.JSXExpressionContainer = JSXExpressionContainer;
-exports.JSXText = JSXText;
-exports.JSXElement = JSXElement;
-exports.JSXOpeningElement = JSXOpeningElement;
-exports.JSXClosingElement = JSXClosingElement;
-exports.JSXEmptyExpression = JSXEmptyExpression;
+module.exports = {
+  JSXAttribute: JSXAttribute,
+  JSXIdentifier: JSXIdentifier,
+  JSXNamespacedName: JSXNamespacedName,
+  JSXMemberExpression: JSXMemberExpression,
+  JSXSpreadAttribute: JSXSpreadAttribute,
+  JSXExpressionContainer: JSXExpressionContainer,
+  JSXText: JSXText,
+  JSXElement: JSXElement,
+  JSXOpeningElement: JSXOpeningElement,
+  JSXClosingElement: JSXClosingElement,
+  JSXEmptyExpression: JSXEmptyExpression
+};
 
 function JSXAttribute(node) {
   this.print(node.name, node);
@@ -85,4 +86,4 @@ function JSXClosingElement(node) {
   this.push(">");
 }
 
-function JSXEmptyExpression() {}
+function JSXEmptyExpression() { }

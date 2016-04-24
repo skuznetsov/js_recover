@@ -2,41 +2,34 @@
 
 "use strict";
 
-var _interopRequireDefault = require("babel-runtime/helpers/interop-require-default")["default"];
+module.exports = {
+  UnaryExpression: UnaryExpression,
+  DoExpression: DoExpression,
+  ParenthesizedExpression: ParenthesizedExpression,
+  UpdateExpression: UpdateExpression,
+  ConditionalExpression: ConditionalExpression,
+  NewExpression: NewExpression,
+  SequenceExpression: SequenceExpression,
+  ThisExpression: ThisExpression,
+  Super: Super,
+  Decorator: Decorator,
+  CallExpression: CallExpression,
+  EmptyStatement: EmptyStatement,
+  ExpressionStatement: ExpressionStatement,
+  AssignmentPattern: AssignmentPattern,
+  AssignmentExpression: AssignmentExpression,
+  BindExpression: BindExpression,
+  MemberExpression: MemberExpression,
+  MetaProperty: MetaProperty,
+  BinaryExpression: AssignmentExpression,
+  LogicalExpression: AssignmentExpression,
+  YieldExpression: YieldExpression,
+  AwaitExpression: AwaitExpression
+};
 
-var _interopRequireWildcard = require("babel-runtime/helpers/interop-require-wildcard")["default"];
-
-exports.__esModule = true;
-exports.UnaryExpression = UnaryExpression;
-exports.DoExpression = DoExpression;
-exports.ParenthesizedExpression = ParenthesizedExpression;
-exports.UpdateExpression = UpdateExpression;
-exports.ConditionalExpression = ConditionalExpression;
-exports.NewExpression = NewExpression;
-exports.SequenceExpression = SequenceExpression;
-exports.ThisExpression = ThisExpression;
-exports.Super = Super;
-exports.Decorator = Decorator;
-exports.CallExpression = CallExpression;
-exports.EmptyStatement = EmptyStatement;
-exports.ExpressionStatement = ExpressionStatement;
-exports.AssignmentPattern = AssignmentPattern;
-exports.AssignmentExpression = AssignmentExpression;
-exports.BindExpression = BindExpression;
-exports.MemberExpression = MemberExpression;
-exports.MetaProperty = MetaProperty;
-
-var _isInteger = require("is-integer");
-
-var _isInteger2 = _interopRequireDefault(_isInteger);
-
-var _babelTypes = require("babel-types");
-
-var t = _interopRequireWildcard(_babelTypes);
-
-var _node = require("../node");
-
-var n = _interopRequireWildcard(_node);
+var isInteger = require("is-integer");
+var t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
+var n = require("../node");
 
 var SCIENTIFIC_NOTATION = /e/i;
 var ZERO_DECIMAL_INTEGER = /\.0+$/;
@@ -164,10 +157,7 @@ function buildYieldAwait(keyword) {
 }
 
 var YieldExpression = buildYieldAwait("yield");
-exports.YieldExpression = YieldExpression;
 var AwaitExpression = buildYieldAwait("await");
-
-exports.AwaitExpression = AwaitExpression;
 
 function EmptyStatement() {
   this._lastPrintedIsEmptyStatement = true;
@@ -230,9 +220,6 @@ function BindExpression(node) {
   this.print(node.callee, node);
 }
 
-exports.BinaryExpression = AssignmentExpression;
-exports.LogicalExpression = AssignmentExpression;
-
 function MemberExpression(node) {
   this.print(node.object, node);
 
@@ -252,7 +239,7 @@ function MemberExpression(node) {
   } else {
     if (t.isNumericLiteral(node.object)) {
       var val = this.getPossibleRaw(node.object) || node.object.value;
-      if (_isInteger2["default"](+val) && !NON_DECIMAL_LITERAL.test(val) && !SCIENTIFIC_NOTATION.test(val) && !ZERO_DECIMAL_INTEGER.test(val) && !this.endsWith(".")) {
+      if (isInteger(+val) && !NON_DECIMAL_LITERAL.test(val) && !SCIENTIFIC_NOTATION.test(val) && !ZERO_DECIMAL_INTEGER.test(val) && !this.endsWith(".")) {
         this.push(".");
       }
     }

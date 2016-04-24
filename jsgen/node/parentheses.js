@@ -1,25 +1,22 @@
 "use strict";
 
-var _interopRequireWildcard = require("babel-runtime/helpers/interop-require-wildcard")["default"];
+module.exports = {
+  NullableTypeAnnotation: NullableTypeAnnotation,
+  UpdateExpression: UpdateExpression,
+  ObjectExpression: ObjectExpression,
+  Binary: Binary,
+  BinaryExpression: BinaryExpression,
+  SequenceExpression: SequenceExpression,
+  YieldExpression: YieldExpression,
+  ClassExpression: ClassExpression,
+  UnaryLike: UnaryLike,
+  FunctionExpression: FunctionExpression,
+  ArrowFunctionExpression: ArrowFunctionExpression,
+  ConditionalExpression: ConditionalExpression,
+  AssignmentExpression: AssignmentExpression
+};
 
-exports.__esModule = true;
-exports.NullableTypeAnnotation = NullableTypeAnnotation;
-exports.UpdateExpression = UpdateExpression;
-exports.ObjectExpression = ObjectExpression;
-exports.Binary = Binary;
-exports.BinaryExpression = BinaryExpression;
-exports.SequenceExpression = SequenceExpression;
-exports.YieldExpression = YieldExpression;
-exports.ClassExpression = ClassExpression;
-exports.UnaryLike = UnaryLike;
-exports.FunctionExpression = FunctionExpression;
-exports.ArrowFunctionExpression = ArrowFunctionExpression;
-exports.ConditionalExpression = ConditionalExpression;
-exports.AssignmentExpression = AssignmentExpression;
-
-var _babelTypes = require("babel-types");
-
-var t = _interopRequireWildcard(_babelTypes);
+var t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
 
 var PRECEDENCE = {
   "||": 0,
@@ -52,7 +49,7 @@ function NullableTypeAnnotation(node, parent) {
   return t.isArrayTypeAnnotation(parent);
 }
 
-exports.FunctionTypeAnnotation = NullableTypeAnnotation;
+module.exports.FunctionTypeAnnotation = NullableTypeAnnotation;
 
 function UpdateExpression(node, parent) {
   if (t.isMemberExpression(parent) && parent.object === node) {
