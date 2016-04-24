@@ -7,7 +7,8 @@ const parser = require('babylon');
 const _ = require('lodash');
 const request = require('request');
 const SourceMapConsumer = require('source-map').SourceMapConsumer;
-const print = require('./jsgen').default;
+const print = require('./jsgen');
+const traverse = require("./traverser").traverse;
 
 String.prototype.last = function() {
   return this[this.length-1];  
@@ -62,6 +63,7 @@ new Promise((resolve, reject) => {
     ]
     });
 
+    traverse(ast, removeLocationInformation);
     // unparse.setupNodePrototype(ast, smc);
     const outputFilePath = `${processingFileName}.out`;
     createAllFoldersInPath(outputFilePath);
@@ -100,4 +102,19 @@ function createAllFoldersInPath(filePath) {
             }
         }            
     });
+}
+
+function removeLocationInformation(node) {
+    if (!node) {
+        return;
+    }
+
+    console.log(`Cleaning ${node.type}...`);
+    
+    for (let prop in node) {
+        if (["loc", "start", "end"].indexOf(prop) > -1) {
+            node[prop] = null;
+            continue;
+        }
+    }
 }

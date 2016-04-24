@@ -7,14 +7,10 @@ const inherits = require("babel-runtime/helpers/inherits").default;
 const classCallCheck = require("babel-runtime/helpers/class-call-check").default;
 const assignToObject = require("babel-runtime/core-js/object/assign").default;
 
-// const _interopRequireWildcard = require("babel-runtime/helpers/interop-require-wildcard")["default"];
 const repeating = require("repeating");
 const Buffer = require("./buffer");
 const n = require("./node");
-
 const t = require("babel-types");
-
-// const t = _interopRequireWildcard(_babelTypes);
 
 inherits(Printer, Buffer);
 
@@ -322,7 +318,7 @@ Printer.prototype.printComment = function printComment(comment) {
         }
 
         var indent = Math.max(this.indentSize(), column);
-        val = val.replace(/\n/g, "\n" + _repeating2["default"](" ", indent));
+        val = val.replace(/\n/g, "\n" + repeating(" ", indent));
     }
 
     if (column === 0) {

@@ -27,9 +27,10 @@ module.exports = {
   AwaitExpression: AwaitExpression
 };
 
-var isInteger = require("is-integer");
-var t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
-var n = require("../node");
+const _ = require("lodash");
+const isInteger = require("is-integer");
+const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
+const n = require("../node");
 
 var SCIENTIFIC_NOTATION = /e/i;
 var ZERO_DECIMAL_INTEGER = /\.0+$/;
