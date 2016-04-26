@@ -227,10 +227,8 @@ function AssignmentExpression(node) {
 function isFirstInStatement(printStack) {
   var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-  var _ref$considerArrow = _ref.considerArrow;
-  var considerArrow = _ref$considerArrow === undefined ? false : _ref$considerArrow;
-  var _ref$considerDefaultExports = _ref.considerDefaultExports;
-  var considerDefaultExports = _ref$considerDefaultExports === undefined ? false : _ref$considerDefaultExports;
+  var considerArrow = !!_ref.considerArrow;
+  var considerDefaultExports = !!_ref.considerDefaultExports;
 
   var i = printStack.length - 1;
   var node = printStack[i];

@@ -12,7 +12,7 @@ const t = require("babel-runtime/helpers/interop-require-wildcard").default(requ
  */
 
 function crawl(node) {
-  var state = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var state = arguments[1] || {};
 
   if (t.isMemberExpression(node)) {
     crawl(node.object, state);

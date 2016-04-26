@@ -348,7 +348,8 @@ Printer.prototype.printComments = function printComments(comments) {
 };
 
 
-_.each([require("./generators/template-literals"),
+_.each(
+    [require("./generators/template-literals"),
     require("./generators/expressions"),
     require("./generators/statements"),
     require("./generators/classes"),
@@ -357,8 +358,10 @@ _.each([require("./generators/template-literals"),
     require("./generators/types"),
     require("./generators/flow"),
     require("./generators/base"),
-    require("./generators/jsx")], function(generator) {
-    assignToObject(Printer.prototype, generator);
-});
+    require("./generators/jsx")],
+    function (generator) {
+        assignToObject(Printer.prototype, generator);
+    }
+);
 
 module.exports = Printer;

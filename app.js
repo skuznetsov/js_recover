@@ -1,4 +1,4 @@
-#!/usr/bin/env node --harmony
+#!/usr/bin/env node
 
 "use strict";
 
@@ -67,15 +67,25 @@ new Promise((resolve, reject) => {
     // unparse.setupNodePrototype(ast, smc);
     const outputFilePath = `${processingFileName}.out`;
     createAllFoldersInPath(outputFilePath);
-    let res = print(ast, {}, "");
-    fs.writeFile(outputFilePath, res.code, err => {
-        if (err) {
-            console.log(`ERROR: Cannot save into ${outputFilePath}`);
-            throw err;
-        }
-        console.log(`Saving into ${outputFilePath}`);
-        process.exit(0);
-    });
+    let res = null;
+    try {
+        res = print(ast, {}, "");
+    } catch(ex) {
+        console.log("ERROR:", ex.stack);
+    }
+    
+    if (res) {
+        fs.writeFile(outputFilePath, res.code, err => {
+            if (err) {
+                console.log(`ERROR: Cannot save into ${outputFilePath}`);
+                throw err;
+            }
+            console.log(`Saving into ${outputFilePath}`);
+            process.exit(0);
+        });
+    }
+}).catch( ex => {
+    console.log("ERROR:", ex);
 });
 
 
@@ -109,7 +119,7 @@ function removeLocationInformation(node) {
         return;
     }
 
-    console.log(`Cleaning ${node.type}...`);
+//    console.log(`Cleaning ${node.type}...`);
     
     for (let prop in node) {
         if (["loc", "start", "end"].indexOf(prop) > -1) {

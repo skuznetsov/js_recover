@@ -67,7 +67,7 @@ const Printer = require("./printer");
       quotes: opts.quotes || CodeGenerator.findCommonStringDelimiter(code, tokens),
       indent: {
         adjustMultilineComment: true,
-        style: style,
+        style: opts.style || style,
         base: 0
       }
     };
@@ -143,4 +143,5 @@ const Printer = require("./printer");
 module.exports = function (ast, opts, code) {
   var gen = new CodeGenerator(ast, opts, code);
   return gen.generate();
-};
+  };
+
