@@ -56,14 +56,15 @@ const Printer = require("./printer");
     }
 
     var format = {
-      auxiliaryCommentBefore: opts.auxiliaryCommentBefore,
-      auxiliaryCommentAfter: opts.auxiliaryCommentAfter,
-      shouldPrintComment: opts.shouldPrintComment,
-      retainLines: opts.retainLines,
+      auxiliaryCommentBefore: !!opts.auxiliaryCommentBefore,
+      auxiliaryCommentAfter: !!opts.auxiliaryCommentAfter,
+      bsd: (opts.bsd === undefined && true) || !!opts.bsd,
+      shouldPrintComment: !!opts.shouldPrintComment,
+      retainLines: !!opts.retainLines,
       comments: opts.comments == null || opts.comments,
-      compact: opts.compact,
-      minified: opts.minified,
-      concise: opts.concise,
+      compact: !!opts.compact,
+      minified: !!opts.minified,
+      concise: !!opts.concise,
       quotes: opts.quotes || CodeGenerator.findCommonStringDelimiter(code, tokens),
       indent: {
         adjustMultilineComment: true,
@@ -140,7 +141,8 @@ const Printer = require("./printer");
     };
   };
 
-module.exports = function (ast, opts, code) {
+module.exports.CodeGenerator = CodeGenerator;
+module.exports.print = function (ast, opts, code) {
   var gen = new CodeGenerator(ast, opts, code);
   return gen.generate();
   };

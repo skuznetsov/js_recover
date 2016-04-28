@@ -19,13 +19,30 @@ module.exports = {
   ContinueStatement: buildLabelStatement("continue"),
   ReturnStatement: buildLabelStatement("return", "argument"),
   BreakStatement: buildLabelStatement("break"),
-  ThrowStatement: buildLabelStatement("throw", "argument")
+  ThrowStatement: buildLabelStatement("throw", "argument"),
+  IsControlFlowStatement: IsControlFlowStatement
 };
 
 const repeating = require("repeating");
 const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
 
 var NON_ALPHABETIC_UNARY_OPERATORS = t.UPDATE_OPERATORS.concat(t.NUMBER_UNARY_OPERATORS).concat(["!"]);
+
+function IsControlFlowStatement(node) {
+  return ["WithStatement",
+       "IfStatement",
+       "ForStatement",
+       "WhileStatement",
+       "DoWhileStatement",
+       "TryStatement",
+       "CatchClause",
+       "SwitchStatement",
+       "ForInStatement",
+       "ForOfStatement"
+      ].indexOf(node.type) == 0;
+}
+
+
 
 function WithStatement(node) {
   this.keyword("with");

@@ -7,8 +7,9 @@ const parser = require('babylon');
 const _ = require('lodash');
 const request = require('request');
 const SourceMapConsumer = require('source-map').SourceMapConsumer;
-const print = require('./jsgen');
+const CodeGenerator = require('./jsgen').CodeGenerator;
 const traverse = require("./traverser").traverse;
+const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
 
 String.prototype.last = function() {
   return this[this.length-1];  
@@ -27,24 +28,28 @@ let mapUrl = (code.match(/^\/\/#\s*sourceMappingURL=(.+)$/gim)||[""])[0].replace
 
 new Promise((resolve, reject) => {
     if (mapUrl) {
-        request.get(mapUrl, function(err, response, body) {
-            if (err) {
-                resolve(null);
-                return;
-            }
-            let smc = new SourceMapConsumer(JSON.parse(body));
-            if (smc.sources && smc.sources.length > 0) {
-                _.each(smc.sources, (src, idx) => {
-                    let fileName = mainPath +
-                                   (mainPath.last() == '/'
-                                    || src[0] == '/' ? "" : "/" )
-                                    + src; 
-                    createAllFoldersInPath(fileName);
-                    fs.writeFileSync(fileName, smc.sourcesContent[idx], {flag: "w" } );
-                });
-            }
-            resolve(smc);
-        });
+        try {
+            request.get(mapUrl, function (err, response, body) {
+                if (err) {
+                    resolve(null);
+                    return;
+                }
+                let smc = new SourceMapConsumer(JSON.parse(body));
+                if (smc.sources && smc.sources.length > 0) {
+                    _.each(smc.sources, (src, idx) => {
+                        let fileName = mainPath +
+                            (mainPath.last() == '/'
+                                || src[0] == '/' ? "" : "/")
+                            + src;
+                        createAllFoldersInPath(fileName);
+                        fs.writeFileSync(fileName, smc.sourcesContent[idx], { flag: "w" });
+                    });
+                }
+                resolve(smc);
+            });
+        } catch (ex) {
+            resolve(null);
+        }    
     } else {
         resolve(null);
     }
@@ -63,13 +68,25 @@ new Promise((resolve, reject) => {
     ]
     });
 
-    traverse(ast, removeLocationInformation);
+    const jsGen = new CodeGenerator(ast, { bsd: false }, "");
+
+    traverse(
+        ast,
+        [
+            recoverNamesFromSourceMaps,
+            fixControlFlowStatementsWithOneStatement,
+            removeLocationInformation
+        ],
+        {
+            generator: jsGen,
+            sourceMapConsumer: smc
+        });
     // unparse.setupNodePrototype(ast, smc);
     const outputFilePath = `${processingFileName}.out`;
     createAllFoldersInPath(outputFilePath);
     let res = null;
     try {
-        res = print(ast, {}, "");
+        res = jsGen.generate();
     } catch(ex) {
         console.log("ERROR:", ex.stack);
     }
@@ -85,7 +102,7 @@ new Promise((resolve, reject) => {
         });
     }
 }).catch( ex => {
-    console.log("ERROR:", ex);
+    console.log("ERROR:", ex.stack);
 });
 
 
@@ -119,12 +136,38 @@ function removeLocationInformation(node) {
         return;
     }
 
-//    console.log(`Cleaning ${node.type}...`);
-    
     for (let prop in node) {
         if (["loc", "start", "end"].indexOf(prop) > -1) {
             node[prop] = null;
             continue;
+        }
+    }
+}
+
+function fixControlFlowStatementsWithOneStatement(node, opts) {
+    if (opts && opts.generator) {
+        let jsGen = opts.generator;
+        if (jsGen.IsControlFlowStatement(node)) {
+            if (node.body && !_.includes(["EmptyStatement", "BlockStatement"], node.body.type)) {
+                console.log(`Fixing body (${node.body.type}) path on ${node.type}`);
+                node.body = t.blockStatement([node.body]);
+            } else if (node.consequent && node.consequent.type != "BlockStatement") {
+                console.log(`Fixing consequent (${node.consequent.type}) path on ${node.type}`);
+                node.consequent = t.blockStatement([node.consequent]);
+            } else if (node.alternate && !_.includes(["IfStatement", "BlockStatement"], node.alternate.type)) {
+                console.log(`Fixing alternate (${node.alternate.type}) path on ${node.type}`);
+                node.alternate = t.blockStatement([node.alternate]);
+            }
+        }
+    }
+}
+
+function recoverNamesFromSourceMaps(node, opts) {
+    let smc = opts.sourceMapConsumer;  
+    if (smc) {
+        let origLoc = smc.originalPositionFor({line: node.loc.start.line, column: node.loc.start.column});
+        if (origLoc && origLoc.name) {
+            node.name = origLoc.name;
         }
     }
 }

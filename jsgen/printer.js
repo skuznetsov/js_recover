@@ -141,7 +141,7 @@ Printer.prototype.printJoin = function printJoin(nodes, parent) {
 
     var _this = this;
 
-    var opts = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var opts = arguments[2] || {};
 
     if (!nodes || !nodes.length) return;
 
@@ -153,7 +153,7 @@ Printer.prototype.printJoin = function printJoin(nodes, parent) {
 
     var printOpts = {
         statement: opts.statement,
-        addNewlines: opts.addNewlines,
+        addNewlines: len < 2 ? false : opts.addNewlines,
         after: function after() {
             if (opts.iterator) {
                 opts.iterator(node, i);
@@ -222,14 +222,14 @@ Printer.prototype.printInnerComments = function printInnerComments(node) {
 };
 
 Printer.prototype.printSequence = function printSequence(nodes, parent) {
-    var opts = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var opts = arguments[2] || {};
 
     opts.statement = true;
     return this.printJoin(nodes, parent, opts);
 };
 
 Printer.prototype.printList = function printList(items, parent) {
-    var opts = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var opts = arguments[2] || {};
 
     if (opts.separator == null) {
         opts.separator = ",";

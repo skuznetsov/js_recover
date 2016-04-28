@@ -218,7 +218,7 @@ _.each({
   }
 
   _.each([type].concat(t.FLIPPED_ALIAS_KEYS[type] || []), function (type) {
-    exports.nodes[type] = function () {
+    module.exports.nodes[type] = function () {
       return amounts;
     };
   });
