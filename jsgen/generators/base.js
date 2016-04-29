@@ -26,7 +26,7 @@ function Program(node) {
 
 function BlockStatement(node, parent) {
 
-  if (!this.format.bsd && this.IsControlFlowStatement(parent.type)) {
+  if (!this.format.bsd && this.IsControlFlowStatement(parent)) {
     this.newline();
   }
 

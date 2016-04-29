@@ -38,8 +38,9 @@ function IsControlFlowStatement(node) {
        "CatchClause",
        "SwitchStatement",
        "ForInStatement",
-       "ForOfStatement"
-      ].indexOf(node.type) == 0;
+       "ForOfStatement",
+       "FunctionDeclaration"
+      ].indexOf(node.type) > -1;
 }
 
 
