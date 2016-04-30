@@ -28,7 +28,7 @@ function Printer() {
 }
 
 Printer.prototype.print = function print(node, parent) {
-    var opts = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var opts = arguments[2] || {};
 
     if (!node) return;
 

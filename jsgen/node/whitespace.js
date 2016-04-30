@@ -22,6 +22,9 @@ function crawl(node) {
     crawl(node.right, state);
   } else if (t.isCallExpression(node)) {
     state.hasCall = true;
+    if (node.callee.name == "require") {
+      state.hasRequire = true;
+    }
     crawl(node.callee, state);
   } else if (t.isFunction(node)) {
     state.hasFunction = true;
@@ -132,7 +135,7 @@ module.exports.nodes = {
       var enabled = isHelper(declar.id) && !isType(declar.init);
       if (!enabled) {
         var state = crawl(declar.init);
-        enabled = isHelper(declar.init) && state.hasCall || state.hasFunction;
+        enabled = isHelper(declar.init) && state.hasCall && !state.hasRequire || state.hasFunction;
       }
 
       if (enabled) {
