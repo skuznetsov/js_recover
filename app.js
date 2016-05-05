@@ -84,18 +84,23 @@ new Promise((resolve, reject) => {
             sourceMapConsumer: smc
         });
 
+    console.log("Traversal finished.")    
+    
     const outputFilePath = `${processingFileName}.out`;
 
     createAllFoldersInPath(outputFilePath);
 
     let res = null;
     try {
+        console.log("Generating code...")    
         res = jsGen.generate();
     } catch(ex) {
         console.log("ERROR:", ex.stack);
     }
     
     if (res) {
+        console.log("Writing generated code...")    
+        
         fs.writeFile(outputFilePath, res.code, err => {
             if (err) {
                 console.log(`ERROR: Cannot save into ${outputFilePath}`);
@@ -154,6 +159,15 @@ function removeLocationInformation(node) {
     }
 }
 
+function wrapSingleStatementIntoBlock(node, prop) {
+    let tempNode = t.blockStatement([node[prop]]);
+    tempNode.parentNode = node[prop].parentNode;
+    tempNode.parentNodeProperty = node[prop].parentNodeProperty;
+    node[prop].parentNode = tempNode;
+    node[prop].parentNodeProperty = prop;
+    node[prop] = tempNode;
+}
+
 function fixControlFlowStatementsWithOneStatement(node, opts)
 {
     if (opts && opts.generator)
@@ -163,14 +177,14 @@ function fixControlFlowStatementsWithOneStatement(node, opts)
         {
             if (node.body && !_.includes(["EmptyStatement", "BlockStatement"], node.body.type))
             {
-                node.body = t.blockStatement([node.body]);
+                wrapSingleStatementIntoBlock(node, "body");
             }
-            else if (node.consequent && node.consequent.type != "BlockStatement")
+            if (node.consequent && node.consequent.type != "BlockStatement")
             {
-                node.consequent = t.blockStatement([node.consequent]);
+                wrapSingleStatementIntoBlock(node, "consequent");
             }
-            else if (node.alternate && !_.includes(["IfStatement", "BlockStatement"], node.alternate.type)) {
-                node.alternate = t.blockStatement([node.alternate]);
+            if (node.alternate && !_.includes(["IfStatement", "BlockStatement"], node.alternate.type)) {
+                wrapSingleStatementIntoBlock(node, "alternate");
             }
         }
     }
@@ -193,7 +207,7 @@ function replaceSequentialAssignments(node, opts) {
         return;
     }
     
-    if (node.type == "SequenceExpression" && parent) {
+    if (node.type == "SequenceExpression") {
         if (parent.type == "BlockStatement" || (parent.parentNode && parent.type == "ExpressionStatement")) {
             console.log(`Rewriting sequence expression. Parent is ${parent.type}, Grandparent is ${parent.parentNode.type}`);
             let child = node;
@@ -236,40 +250,34 @@ function replaceSequentialAssignmentsInFlowControl(node, opts) {
     if (!parent) {
         return;
     }
-    
-    if (node.type == "SequenceExpression" && parent) {
-        if (parent.type == "BlockStatement" || (parent.parentNode && parent.type == "ExpressionStatement")) {
-            console.log(`Rewriting sequence expression. Parent is ${parent.type}, Grandparent is ${parent.parentNode.type}`);
-            let child = node;
-            if (parent.type == "ExpressionStatement") {
-                parentProperty = parent.parentNodeProperty;
-                child = parent;
-                parent = parent.parentNode;
-            }
 
-            let expressions = _.map(node.expressions, n => {
-                let e = t.expressionStatement(n);
-                n.parentNode = e;
-                n.parentNodeProperty = "expression";
-                return e;
+    if (node.type == "ReturnStatement" && node.argument && ["SequenceExpression" /*, "AssignmentExpression" */].indexOf(node.argument.type) > -1) {
+        console.log(`Return argument is ${node.argument.type}`);
+        let lastExpression = node.argument.expressions.pop();
+        let expressions = _.map(node.argument.expressions, n => {
+            let e = t.expressionStatement(n);
+            n.parentNode = e;
+            n.parentNodeProperty = "expression";
+            e.parentNode = parent;
+            e.parentNodeProperty = parentProperty;
+            return e;
+        });
+
+        node.argument = lastExpression;
+
+        if (parent[parentProperty].constructor.name == "Array") {
+            // Replace Sequence statement with it's content nodes
+            let pos = parent[parentProperty].indexOf(node);
+            let params = [pos, 0].concat(expressions);
+            let test = parent[parentProperty].splice.apply(parent[parentProperty], params);
+        } else {
+            expressions = _.map(e => { })
+            let b = t.blockStatement(expressions.concat([node]));
+            _.each(expressions, e => {
+                e.parentNode = b;
+                e.parentNodeProperty = "body";
             });
-            if (parent[parentProperty].constructor.name == "Array") {
-                // Replace Sequence statement with it's content nodes
-                _.map(expressions, e => { 
-                    e.parentNode = parent;
-                    e.parentNodeProperty = parentProperty;
-                });
-                let pos = parent[parentProperty].indexOf(child);
-                let params = [pos, 1].concat(expressions);
-                let test = parent[parentProperty].splice.apply(parent[parentProperty], params);
-            } else {
-                let b = t.blockStatement(expressions);
-                _.map(expressions, e => { 
-                    e.parentNode = b;
-                    e.parentNodeProperty = "body";
-                });
-                parent[parentProperty] = b;
-            }
+            parent[parentProperty] = b;
         }
     }    
 }
