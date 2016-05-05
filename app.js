@@ -161,10 +161,10 @@ function removeLocationInformation(node) {
 
 function wrapSingleStatementIntoBlock(node, prop) {
     let tempNode = t.blockStatement([node[prop]]);
-    tempNode.parentNode = node[prop].parentNode;
-    tempNode.parentNodeProperty = node[prop].parentNodeProperty;
+    tempNode.parentNode = node;
+    tempNode.parentNodeProperty = prop;
     node[prop].parentNode = tempNode;
-    node[prop].parentNodeProperty = prop;
+    node[prop].parentNodeProperty = "body";
     node[prop] = tempNode;
 }
 
@@ -264,20 +264,24 @@ function replaceSequentialAssignmentsInFlowControl(node, opts) {
         });
 
         node.argument = lastExpression;
-
-        if (parent[parentProperty].constructor.name == "Array") {
-            // Replace Sequence statement with it's content nodes
-            let pos = parent[parentProperty].indexOf(node);
-            let params = [pos, 0].concat(expressions);
-            let test = parent[parentProperty].splice.apply(parent[parentProperty], params);
-        } else {
-            expressions = _.map(e => { })
-            let b = t.blockStatement(expressions.concat([node]));
-            _.each(expressions, e => {
-                e.parentNode = b;
-                e.parentNodeProperty = "body";
-            });
-            parent[parentProperty] = b;
-        }
+        try {
+            if (parent[parentProperty].constructor.name == "Array") {
+                // Replace Sequence statement with it's content nodes
+                let pos = parent[parentProperty].indexOf(node);
+                let params = [pos, 0].concat(expressions);
+                let test = parent[parentProperty].splice.apply(parent[parentProperty], params);
+            } else {
+                expressions = _.map(e => { })
+                let b = t.blockStatement(expressions.concat([node]));
+                _.each(expressions, e => {
+                    e.parentNode = b;
+                    e.parentNodeProperty = "body";
+                });
+                parent[parentProperty] = b;
+            }
+        } catch (e) {
+            console.log(`ERROR: ${parent.type} in property ${parentProperty}`, parent[parentProperty]);
+            throw e;
+        }    
     }    
 }
