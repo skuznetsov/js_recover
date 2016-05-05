@@ -75,15 +75,19 @@ new Promise((resolve, reject) => {
         [
             recoverNamesFromSourceMaps,
             fixControlFlowStatementsWithOneStatement,
-            removeLocationInformation
+            removeLocationInformation,
+            replaceSequentialAssignments,
+            replaceSequentialAssignmentsInFlowControl
         ],
         {
             generator: jsGen,
             sourceMapConsumer: smc
         });
-    // unparse.setupNodePrototype(ast, smc);
+
     const outputFilePath = `${processingFileName}.out`;
+
     createAllFoldersInPath(outputFilePath);
+
     let res = null;
     try {
         res = jsGen.generate();
@@ -131,6 +135,12 @@ function createAllFoldersInPath(filePath) {
     });
 }
 
+//
+//
+// Visitors section
+//
+//
+
 function removeLocationInformation(node) {
     if (!node) {
         return;
@@ -138,24 +148,28 @@ function removeLocationInformation(node) {
 
     for (let prop in node) {
         if (["loc", "start", "end"].indexOf(prop) > -1) {
-            node[prop] = null;
+            delete node[prop];
             continue;
         }
     }
 }
 
-function fixControlFlowStatementsWithOneStatement(node, opts) {
-    if (opts && opts.generator) {
+function fixControlFlowStatementsWithOneStatement(node, opts)
+{
+    if (opts && opts.generator)
+    {
         let jsGen = opts.generator;
-        if (jsGen.IsControlFlowStatement(node)) {
-            if (node.body && !_.includes(["EmptyStatement", "BlockStatement"], node.body.type)) {
-                console.log(`Fixing body (${node.body.type}) path on ${node.type}`);
+        if (jsGen.IsControlFlowStatement(node))
+        {
+            if (node.body && !_.includes(["EmptyStatement", "BlockStatement"], node.body.type))
+            {
                 node.body = t.blockStatement([node.body]);
-            } else if (node.consequent && node.consequent.type != "BlockStatement") {
-                console.log(`Fixing consequent (${node.consequent.type}) path on ${node.type}`);
+            }
+            else if (node.consequent && node.consequent.type != "BlockStatement")
+            {
                 node.consequent = t.blockStatement([node.consequent]);
-            } else if (node.alternate && !_.includes(["IfStatement", "BlockStatement"], node.alternate.type)) {
-                console.log(`Fixing alternate (${node.alternate.type}) path on ${node.type}`);
+            }
+            else if (node.alternate && !_.includes(["IfStatement", "BlockStatement"], node.alternate.type)) {
                 node.alternate = t.blockStatement([node.alternate]);
             }
         }
@@ -170,4 +184,92 @@ function recoverNamesFromSourceMaps(node, opts) {
             node.name = origLoc.name;
         }
     }
+}
+
+function replaceSequentialAssignments(node, opts) {
+    let parent = node.parentNode;
+    let parentProperty = node.parentNodeProperty;
+    if (!parent) {
+        return;
+    }
+    
+    if (node.type == "SequenceExpression" && parent) {
+        if (parent.type == "BlockStatement" || (parent.parentNode && parent.type == "ExpressionStatement")) {
+            console.log(`Rewriting sequence expression. Parent is ${parent.type}, Grandparent is ${parent.parentNode.type}`);
+            let child = node;
+            if (parent.type == "ExpressionStatement") {
+                parentProperty = parent.parentNodeProperty;
+                child = parent;
+                parent = parent.parentNode;
+            }
+
+            let expressions = _.map(node.expressions, n => {
+                let e = t.expressionStatement(n);
+                n.parentNode = e;
+                n.parentNodeProperty = "expression";
+                return e;
+            });
+            if (parent[parentProperty].constructor.name == "Array") {
+                // Replace Sequence statement with it's content nodes
+                _.map(expressions, e => { 
+                    e.parentNode = parent;
+                    e.parentNodeProperty = parentProperty;
+                });
+                let pos = parent[parentProperty].indexOf(child);
+                let params = [pos, 1].concat(expressions);
+                let test = parent[parentProperty].splice.apply(parent[parentProperty], params);
+            } else {
+                let b = t.blockStatement(expressions);
+                _.map(expressions, e => { 
+                    e.parentNode = b;
+                    e.parentNodeProperty = "body";
+                });
+                parent[parentProperty] = b;
+            }
+        }
+    }    
+}
+
+function replaceSequentialAssignmentsInFlowControl(node, opts) {
+    let parent = node.parentNode;
+    let parentProperty = node.parentNodeProperty;
+    if (!parent) {
+        return;
+    }
+    
+    if (node.type == "SequenceExpression" && parent) {
+        if (parent.type == "BlockStatement" || (parent.parentNode && parent.type == "ExpressionStatement")) {
+            console.log(`Rewriting sequence expression. Parent is ${parent.type}, Grandparent is ${parent.parentNode.type}`);
+            let child = node;
+            if (parent.type == "ExpressionStatement") {
+                parentProperty = parent.parentNodeProperty;
+                child = parent;
+                parent = parent.parentNode;
+            }
+
+            let expressions = _.map(node.expressions, n => {
+                let e = t.expressionStatement(n);
+                n.parentNode = e;
+                n.parentNodeProperty = "expression";
+                return e;
+            });
+            if (parent[parentProperty].constructor.name == "Array") {
+                // Replace Sequence statement with it's content nodes
+                _.map(expressions, e => { 
+                    e.parentNode = parent;
+                    e.parentNodeProperty = parentProperty;
+                });
+                let pos = parent[parentProperty].indexOf(child);
+                let params = [pos, 1].concat(expressions);
+                let test = parent[parentProperty].splice.apply(parent[parentProperty], params);
+            } else {
+                let b = t.blockStatement(expressions);
+                _.map(expressions, e => { 
+                    e.parentNode = b;
+                    e.parentNodeProperty = "body";
+                });
+                parent[parentProperty] = b;
+            }
+        }
+    }    
 }
