@@ -1,5 +1,23 @@
 {
-    "defaultFileToProcess": "print.js",
+    "defaultFileToProcess": "data/loader.js",
+    "sourceMaps": {
+	"use": false,
+	"saveOriginals": false,
+	"defaultOutputFolder": "./output"
+    },
+    "parser": {
+        // parse in strict mode and allow module declarations
+	sourceType: "file",
+
+        plugins: [
+	    // enable experimental async functions
+    	    "asyncFunctions",
+
+            // enable jsx and flow syntax
+	    "jsx",
+    	    "flow"
+	]
+    },
     "codeGenerator": {
 	"bsd": false
     }

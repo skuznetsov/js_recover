@@ -18,25 +18,26 @@ String.prototype.last = function() {
 
 const processingFileName = fs.realpathSync(process.argv[2] || config.defaultFileToProcess);
 const code = fs.readFileSync(processingFileName, "utf8");
-let mainPath = process.argc > 2 ? process.argv[3] : "/tmp/jsUnparse";
-mainPath = fs.realpathSync(mainPath);
-mainPath += (mainPath.last() == "/" ? "" : "/");
-createAllFoldersInPath(mainPath);
-
 console.log(`Processing ${processingFileName}...`);
 
 let mapUrl = (code.match(/^\/\/#\s*sourceMappingURL=(.+)$/gim)||[""])[0].replace(/^\/\/#\s*sourceMappingURL=/, '');
 
 new Promise((resolve, reject) => {
-    if (mapUrl) {
+    if (config.sourceMaps.use && mapUrl) {
         try {
             request.get(mapUrl, function (err, response, body) {
-                if (err) {
+                if (err)
+                {
                     resolve(null);
                     return;
                 }
+                let mainPath = process.argc > 2 ? process.argv[3] : config.sourceMaps.defaultOutputFolder;
+                mainPath = fs.realpathSync(mainPath);
+                mainPath += (mainPath.last() == "/" ? "" : "/");
+                createAllFoldersInPath(mainPath);
+
                 let smc = new SourceMapConsumer(JSON.parse(body));
-                if (smc.sources && smc.sources.length > 0) {
+                if (config.sourceMaps.saveOriginals && smc.sources && smc.sources.length > 0) {
                     _.each(smc.sources, (src, idx) => {
                         let fileName = mainPath +
                             (mainPath.last() == '/'
@@ -55,26 +56,14 @@ new Promise((resolve, reject) => {
         resolve(null);
     }
 }).then (smc => {
-    const ast = parser.parse(code, {
-    // parse in strict mode and allow module declarations
-    sourceType: "file",
-
-    plugins: [
-        // enable experimental async functions
-        "asyncFunctions",
-
-        // enable jsx and flow syntax
-        "jsx",
-        "flow"
-    ]
-    });
+    const ast = parser.parse(code, config.parser);
 
     const jsGen = new CodeGenerator(ast, config.codeGenerator, "");
 
     traverse(
         ast,
         [
-        //    recoverNamesFromSourceMaps,
+            recoverNamesFromSourceMaps,
             fixControlFlowStatementsWithOneStatement,
             removeLocationInformation,
             replaceSequentialAssignmentsInFunctions,
