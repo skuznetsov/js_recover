@@ -73,9 +73,10 @@ new Promise((resolve, reject) => {
     traverse(
         ast,
         [
-            recoverNamesFromSourceMaps,
+        //    recoverNamesFromSourceMaps,
             fixControlFlowStatementsWithOneStatement,
             removeLocationInformation,
+            replaceSequentialAssignmentsInFunctions,
             replaceSequentialAssignments,
             replaceSequentialAssignmentsInFlowControl
         ],
@@ -208,8 +209,8 @@ function replaceSequentialAssignments(node, opts) {
     }
     
     if (node.type == "SequenceExpression") {
-        if (parent.type == "BlockStatement" || (parent.parentNode && parent.type == "ExpressionStatement")) {
-            console.log(`Rewriting sequence expression. Parent is ${parent.type}, Grandparent is ${parent.parentNode.type}`);
+        if (parent.parentNode && parent.type == "ExpressionStatement" && parent.parentNode.type == "BlockStatement") {
+            // console.log(`Rewriting sequence expression. Parent is ${parent.type}, Grandparent is ${parent.parentNode.type}`);
             let child = node;
             if (parent.type == "ExpressionStatement") {
                 parentProperty = parent.parentNodeProperty;
@@ -251,8 +252,8 @@ function replaceSequentialAssignmentsInFlowControl(node, opts) {
         return;
     }
 
-    if (node.type == "ReturnStatement" && node.argument && ["SequenceExpression" /*, "AssignmentExpression" */].indexOf(node.argument.type) > -1) {
-        console.log(`Return argument is ${node.argument.type}`);
+    if (node.type == "ReturnStatement" && node.argument && ["SequenceExpression"].indexOf(node.argument.type) > -1) {
+        // console.log(`Return argument is ${node.argument.type}`);
         let lastExpression = node.argument.expressions.pop();
         let expressions = _.map(node.argument.expressions, n => {
             let e = t.expressionStatement(n);
@@ -284,4 +285,16 @@ function replaceSequentialAssignmentsInFlowControl(node, opts) {
             throw e;
         }    
     }    
+}
+
+function replaceSequentialAssignmentsInFunctions(node, opts) {
+    let parent = node.parentNode;
+    let parentProperty = node.parentNodeProperty;
+    if (!parent) {
+        return;
+    }
+
+    if (["FunctionExpression", "FunctionDeclaration"].indexOf(node.type) > -1) {
+        console.log(`Function Definition. Name: ${node.type == "FunctionExpression" ? (node.parentNode.left || {id: ""}).id : node.id}`);
+    }
 }
