@@ -1,0 +1,6 @@
+{
+    "defaultFileToProcess": "print.js",
+    "codeGenerator": {
+	"bsd": false
+    }
+}

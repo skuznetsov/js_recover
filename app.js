@@ -2,6 +2,7 @@
 
 "use strict";
 
+const config = require('config');
 const fs = require('fs');
 const parser = require('babylon');
 const _ = require('lodash');
@@ -15,7 +16,7 @@ String.prototype.last = function() {
   return this[this.length-1];  
 };
 
-const processingFileName = fs.realpathSync(process.argv[2] || "data/simpleWorker.js");
+const processingFileName = fs.realpathSync(process.argv[2] || config.defaultFileToProcess);
 const code = fs.readFileSync(processingFileName, "utf8");
 let mainPath = process.argc > 2 ? process.argv[3] : "/tmp/jsUnparse";
 mainPath = fs.realpathSync(mainPath);
@@ -68,7 +69,7 @@ new Promise((resolve, reject) => {
     ]
     });
 
-    const jsGen = new CodeGenerator(ast, { bsd: false }, "");
+    const jsGen = new CodeGenerator(ast, config.codeGenerator, "");
 
     traverse(
         ast,
