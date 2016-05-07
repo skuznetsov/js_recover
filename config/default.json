@@ -1,4 +1,5 @@
 {
+    "verbose": false,
     "defaultFileToProcess": "data/loader.js",
     "sourceMaps": {
 	"use": false,

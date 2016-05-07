@@ -2,6 +2,8 @@
 
 "use strict";
 
+console.log(__dirname);
+
 const config = require('config');
 const fs = require('fs');
 const parser = require('babylon');
@@ -60,6 +62,7 @@ new Promise((resolve, reject) => {
 
     const jsGen = new CodeGenerator(ast, config.codeGenerator, "");
 
+    // Step 1
     traverse(
         ast,
         [
@@ -67,15 +70,30 @@ new Promise((resolve, reject) => {
             fixControlFlowStatementsWithOneStatement,
             removeLocationInformation,
             replaceSequentialAssignmentsInFunctions,
-            replaceSequentialAssignments,
-            replaceSequentialAssignmentsInFlowControl
         ],
         {
             generator: jsGen,
             sourceMapConsumer: smc
         });
 
-    console.log("Traversal finished.")    
+    // Step 2
+    traverse(
+        ast,
+        [
+            replaceSequentialAssignments,
+        ]);
+
+    // Step 3
+    traverse(
+        ast,
+        [
+            replaceSequentialAssignmentsInFlowControl
+        ]);
+    
+    
+    if (config.verbose) {
+        console.log("Traversal finished.");
+    }
     
     const outputFilePath = `${processingFileName}.out`;
 
@@ -200,7 +218,9 @@ function replaceSequentialAssignments(node, opts) {
     
     if (node.type == "SequenceExpression") {
         if (parent.parentNode && parent.type == "ExpressionStatement" && parent.parentNode.type == "BlockStatement") {
-            // console.log(`Rewriting sequence expression. Parent is ${parent.type}, Grandparent is ${parent.parentNode.type}`);
+            if (config.verbose) {
+                console.log(`Rewriting sequence expression. Parent is ${parent.type}, Grandparent is ${parent.parentNode.type}`);
+            }
             let child = node;
             if (parent.type == "ExpressionStatement") {
                 parentProperty = parent.parentNodeProperty;
@@ -243,7 +263,9 @@ function replaceSequentialAssignmentsInFlowControl(node, opts) {
     }
 
     if (node.type == "ReturnStatement" && node.argument && ["SequenceExpression"].indexOf(node.argument.type) > -1) {
-        // console.log(`Return argument is ${node.argument.type}`);
+        if (config.verbose) {
+            console.log(`Return argument is ${node.argument.type}`);
+        }                
         let lastExpression = node.argument.expressions.pop();
         let expressions = _.map(node.argument.expressions, n => {
             let e = t.expressionStatement(n);
@@ -285,6 +307,8 @@ function replaceSequentialAssignmentsInFunctions(node, opts) {
     }
 
     if (["FunctionExpression", "FunctionDeclaration"].indexOf(node.type) > -1) {
-        console.log(`Function Definition. Name: ${node.type == "FunctionExpression" ? (node.parentNode.left || {id: ""}).id : node.id}`);
+        if (config.verbose) {
+            console.log(`Function Definition. Name: ${node.type == "FunctionExpression" ? (node.parentNode.left || { id: "" }).id : node.id}`);
+        }                
     }
 }
