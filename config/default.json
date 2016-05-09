@@ -2,22 +2,17 @@
     "verbose": false,
     "defaultFileToProcess": "data/loader.js",
     "sourceMaps": {
-	"use": false,
-	"saveOriginals": false,
-	"defaultOutputFolder": "./output"
+    "use": false,
+        "saveOriginals": false,
+        "defaultOutputFolder": "./output"
     },
     "parser": {
-        // parse in strict mode and allow module declarations
-	sourceType: "file",
-
-        plugins: [
-	    // enable experimental async functions
+        "sourceType": "file",
+        "plugins": [
     	    "asyncFunctions",
-
-            // enable jsx and flow syntax
-	    "jsx",
+	        "jsx",
     	    "flow"
-	]
+	    ]
     },
     "codeGenerator": {
 	"bsd": false

@@ -2,7 +2,9 @@
 
 "use strict";
 
-console.log(__dirname);
+if (!process.env.NODE_CONFIG_DIR) {
+    process.env.NODE_CONFIG_DIR = __dirname + "/config";
+}
 
 const config = require('config');
 const fs = require('fs');
@@ -13,6 +15,13 @@ const SourceMapConsumer = require('source-map').SourceMapConsumer;
 const CodeGenerator = require('./jsgen').CodeGenerator;
 const traverse = require("./traverser").traverse;
 const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
+
+
+if (typeof(config.verbose) === "undefined" ) {
+    console.error(`ERROR: Cannot find config file at ${process.env.NODE_CONFIG_DIR}`);
+    process.exit(1);
+}
+
 
 String.prototype.last = function() {
   return this[this.length-1];  
@@ -307,8 +316,8 @@ function replaceSequentialAssignmentsInFunctions(node, opts) {
     }
 
     if (["FunctionExpression", "FunctionDeclaration"].indexOf(node.type) > -1) {
-        if (config.verbose) {
+        // if (config.verbose) {
             console.log(`Function Definition. Name: ${node.type == "FunctionExpression" ? (node.parentNode.left || { id: "" }).id : node.id}`);
-        }                
+        // }                
     }
 }
