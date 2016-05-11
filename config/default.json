@@ -2,7 +2,7 @@
     "verbose": false,
     "defaultFileToProcess": "data/loader.js",
     "sourceMaps": {
-    "use": false,
+        "use": false,
         "saveOriginals": false,
         "defaultOutputFolder": "./output"
     },
