@@ -106,6 +106,12 @@ new Promise((resolve, reject) => {
             assignValuesToVariables
         ]);
     
+    // Step 5: Dumping scopes of variables
+    traverse(
+        ast,
+        [
+            dumpScopes
+        ]);
     
     if (config.verbose) {
         console.log("Traversal finished.");
@@ -322,25 +328,29 @@ function createScopes(node, opts) {
         return;
     }
 
-    if (node.type == "BlockStatement") {
-        // if (config.verbose) {
-        console.log(`Scope Definition. Name: ${node.parentNode.type}`);
-        // }
+    if (["BlockStatement", "Program"].indexOf(node.type) > -1) {
+        if (config.verbose) {
+            console.log(`Scope Definition. Name: ${node.parentNode.type}`);
+        }
         node._state = node._state || { scope: {} };
         node._state.scope = node._state.scope || {};
         _.each(node.body, n => {
             if (n.type == "VariableDeclaration") {
                 _.each(n.declarations, declarationNode => {
                     node._state.scope[declarationNode.id.name] = declarationNode.init || null;
-                    // if (config.verbose) {
-                    console.log(`Defining ${declarationNode.id.name} of type ${(declarationNode.init || { type: "None" }).type} on scope`);
-                    // }
+                    if (config.verbose) {
+                        console.log(`Defining ${declarationNode.id.name} of type ${(declarationNode.init || { type: "None" }).type} on scope`);
+                    }
                 });
             } else if (n.type == "FunctionDeclaration") {
                 node._state.scope[n.id.name] = n;
-                console.log(`Defining function ${n.id.name} on scope`);
+                if (config.verbose) {
+                    console.log(`Defining function ${n.id.name} on scope`);
+                }        
             } else {
-                console.log(`Node type: ${n.type}`);
+                if (config.verbose) {
+                    console.log(`Node type: ${n.type}`);
+                }        
             }    
         });
     }
@@ -353,10 +363,47 @@ function assignValuesToVariables(node, opts) {
         return;
     }
 
-    if (node.type == "AssignmentExpression" && node.left.type == "Identifier" && node.opeerator == "=") {
+    if (/^Assignment(Expression|Pattern)$/.test(node.type) && node.left.type == "Identifier" && node.operator == "=") {
         // if (config.verbose) {
-        console.log(`Populating values to variable ${node.left.name}.`);
+            console.log(`Populating values to variable ${node.left.name}.`);
         // }
-        node._state.scope[node.left.name] = node.right;
+        let scope = null;
+        let topNode = node;
+
+        while (topNode) {
+            if (topNode._state && topNode._state.scope) {
+                scope = topNode._state.scope;
+                if (node.left.name in scope) {
+                    break;
+                }
+            }
+            topNode = topNode.parentNode;
+        }
+
+        if (scope && node.left.name in scope) {
+            scope[node.left.name] = node.right;
+        } else {
+            if (!scope) {
+                console.log(`Scope is not defined for ${node.left.name}`);
+            } else {
+                console.log(`Cannot find definition of ${node.left.name} on parent scopes`);
+            }
+        }
+    }
+}
+
+function dumpScopes(node, opts) {
+    let parent = node.parentNode;
+    if (node._state && node._state.scope && Object.keys(node._state.scope).length > 0) {
+        let scope = "";
+        if (parent.type == "FunctionDeclaration") {
+            scope = " " + parent.id.name;
+        } else if (parent.type == "FunctionExpression" && parent.parentNode.type == "AssignmentExpression" && parent.parentNode.left.type == "Identifier") {
+            scope = " " + parent.parentNode.left.name;
+        }
+        console.log(`Scope${scope}:`);
+        _.each(node._state.scope, (val, key) => { 
+            console.log(`\tVariable ${key} ${val == null ? "is NOT USED" : "" }`);
+        });
     }
 }
