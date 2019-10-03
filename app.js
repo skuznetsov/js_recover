@@ -12,16 +12,25 @@ const parser = require('babylon');
 const _ = require('lodash');
 const request = require('request');
 const SourceMapConsumer = require('source-map').SourceMapConsumer;
-const CodeGenerator = require('./jsgen').CodeGenerator;
-const traverse = require("./traverser").traverse;
-const t = require("babel-runtime/helpers/interop-require-wildcard").default(require("babel-types"));
+const CodeGenerator = require('./lib/jsgen').CodeGenerator;
+const traverse = require("./lib/traverser");
 
+// Node mutators
+const dumpScopes = require("./lib/mutators/dump_scopes");
+const assignValuesToVariables = require("./lib/mutators/assign_values_to_variables");
+const createScopes = require("./lib/mutators/create_scopes");
+const replaceSequentialAssignmentsInFlowControl = require("./lib/mutators/replace_sequential_assignments_in_flow_control");
+const replaceSequentialAssignments = require("./lib/mutators/replace_sequential_assignments");
+// const recoverNamesFromSourceMaps = require("./lib/mutators/recover_names_from_source_maps");
+const fixControlFlowStatementsWithOneStatement = require("./lib/mutators/fix_control_flow_statements_with_one_statement");
+const removeLocationInformation = require("./lib/mutators/remove_location_information");
+const recoverBooleans = require("./lib/mutators/recover_booleans");
+const { createAllFoldersInPath} = require("./lib/utils");
 
 if (typeof(config.verbose) === "undefined" ) {
     console.error(`ERROR: Cannot find config file at ${process.env.NODE_CONFIG_DIR}`);
     process.exit(1);
 }
-
 
 String.prototype.last = function() {
   return this[this.length-1];  
@@ -69,50 +78,54 @@ new Promise((resolve, reject) => {
 }).then (smc => {
     const ast = parser.parse(code, config.parser);
 
+    fs.writeFileSync('./ast.before.json', JSON.stringify(ast, null, 2));
+
     const jsGen = new CodeGenerator(ast, config.codeGenerator, "");
 
-    // Step 1
+    // Pre-step
     traverse(
         ast,
         [
-            recoverNamesFromSourceMaps,
-            fixControlFlowStatementsWithOneStatement,
-            removeLocationInformation
+            removeLocationInformation,
+            recoverBooleans,
         ],
         {
             generator: jsGen,
-            sourceMapConsumer: smc
+            // sourceMapConsumer: smc,
+            config
         });
 
-    // Step 2
-    traverse(
+    // Step 1
+    while(traverse(
         ast,
         [
+            fixControlFlowStatementsWithOneStatement,
             replaceSequentialAssignments,
-        ]);
-
-    // Step 3
-    traverse(
-        ast,
-        [
             replaceSequentialAssignmentsInFlowControl
-        ]);
+ ],
+        {
+            generator: jsGen,
+            // sourceMapConsumer: smc,
+            config
+        }));
 
-    // Step 4: Painting of variables
+    // Painting of variables
     traverse(
         ast,
         [
             createScopes,
             assignValuesToVariables
-        ]);
+        ], {config});
     
-    // Step 5: Dumping scopes of variables
+    // Dumping scopes of variables
     traverse(
         ast,
         [
             dumpScopes
-        ]);
-    
+        ], {config});
+
+    fs.writeFileSync('./ast.after.json', JSON.stringify(ast, (k,v) => ['parentNode', 'parentNodeProperty'].includes(k) ? null : v, 2));
+
     if (config.verbose) {
         console.log("Traversal finished.");
     }
@@ -144,266 +157,3 @@ new Promise((resolve, reject) => {
 }).catch( ex => {
     console.log("ERROR:", ex.stack);
 });
-
-
-function createAllFoldersInPath(filePath) {
-    let entries = filePath.split('/');
-    let path = '';
-    entries.forEach(function(element, idx) {
-        if (element == "") {
-            return;
-        }
-            
-        if (idx >= entries.length - 1) {
-            return;
-        }
-        path += (idx > 0 ? '/' : '') + element;
-        try {
-            fs.statSync(path);
-        } catch(ex) {
-            if (ex.code != 'ENOENT') {
-                console.log(ex);
-                throw ex;
-            } else {
-                fs.mkdirSync(path);
-            }
-        }            
-    });
-}
-
-//
-//
-// Visitors section
-//
-//
-
-function removeLocationInformation(node) {
-    if (!node) {
-        return;
-    }
-
-    for (let prop in node) {
-        if (["loc", "start", "end"].indexOf(prop) > -1) {
-            delete node[prop];
-            continue;
-        }
-    }
-}
-
-function wrapSingleStatementIntoBlock(node, prop) {
-    let tempNode = t.blockStatement([node[prop]]);
-    tempNode.parentNode = node;
-    tempNode.parentNodeProperty = prop;
-    node[prop].parentNode = tempNode;
-    node[prop].parentNodeProperty = "body";
-    node[prop] = tempNode;
-}
-
-function fixControlFlowStatementsWithOneStatement(node, opts)
-{
-    if (opts && opts.generator)
-    {
-        let jsGen = opts.generator;
-        if (jsGen.IsControlFlowStatement(node))
-        {
-            if (node.body && !_.includes(["EmptyStatement", "BlockStatement"], node.body.type))
-            {
-                wrapSingleStatementIntoBlock(node, "body");
-            }
-            if (node.consequent && node.consequent.type != "BlockStatement")
-            {
-                wrapSingleStatementIntoBlock(node, "consequent");
-            }
-            if (node.alternate && !_.includes(["IfStatement", "BlockStatement"], node.alternate.type)) {
-                wrapSingleStatementIntoBlock(node, "alternate");
-            }
-        }
-    }
-}
-
-function recoverNamesFromSourceMaps(node, opts) {
-    let smc = opts.sourceMapConsumer;  
-    if (smc) {
-        let origLoc = smc.originalPositionFor({line: node.loc.start.line, column: node.loc.start.column});
-        if (origLoc && origLoc.name) {
-            node.name = origLoc.name;
-        }
-    }
-}
-
-function replaceSequentialAssignments(node, opts) {
-    let parent = node.parentNode;
-    let parentProperty = node.parentNodeProperty;
-    if (!parent) {
-        return;
-    }
-    
-    if (node.type == "SequenceExpression") {
-        if (parent.parentNode && parent.type == "ExpressionStatement" && parent.parentNode.type == "BlockStatement") {
-            if (config.verbose) {
-                console.log(`Rewriting sequence expression. Parent is ${parent.type}, Grandparent is ${parent.parentNode.type}`);
-            }
-            let child = node;
-            if (parent.type == "ExpressionStatement") {
-                parentProperty = parent.parentNodeProperty;
-                child = parent;
-                parent = parent.parentNode;
-            }
-
-            let expressions = _.map(node.expressions, n => {
-                let e = t.expressionStatement(n);
-                n.parentNode = e;
-                n.parentNodeProperty = "expression";
-                return e;
-            });
-            if (parent[parentProperty].constructor.name == "Array") {
-                // Replace Sequence statement with it's content nodes
-                _.map(expressions, e => { 
-                    e.parentNode = parent;
-                    e.parentNodeProperty = parentProperty;
-                });
-                let pos = parent[parentProperty].indexOf(child);
-                let params = [pos, 1].concat(expressions);
-                let test = parent[parentProperty].splice.apply(parent[parentProperty], params);
-            } else {
-                let b = t.blockStatement(expressions);
-                _.map(expressions, e => { 
-                    e.parentNode = b;
-                    e.parentNodeProperty = "body";
-                });
-                parent[parentProperty] = b;
-            }
-        }
-    }    
-}
-
-function replaceSequentialAssignmentsInFlowControl(node, opts) {
-    let parent = node.parentNode;
-    let parentProperty = node.parentNodeProperty;
-    if (!parent) {
-        return;
-    }
-
-    if (node.type == "ReturnStatement" && node.argument && ["SequenceExpression"].indexOf(node.argument.type) > -1) {
-        if (config.verbose) {
-            console.log(`Return argument is ${node.argument.type}`);
-        }                
-        let lastExpression = node.argument.expressions.pop();
-        let expressions = _.map(node.argument.expressions, n => {
-            let e = t.expressionStatement(n);
-            n.parentNode = e;
-            n.parentNodeProperty = "expression";
-            e.parentNode = parent;
-            e.parentNodeProperty = parentProperty;
-            return e;
-        });
-
-        node.argument = lastExpression;
-        try {
-            if (parent[parentProperty].constructor.name == "Array") {
-                // Replace Sequence statement with it's content nodes
-                let pos = parent[parentProperty].indexOf(node);
-                let params = [pos, 0].concat(expressions);
-                let test = parent[parentProperty].splice.apply(parent[parentProperty], params);
-            } else {
-                expressions = _.map(e => { })
-                let b = t.blockStatement(expressions.concat([node]));
-                _.each(expressions, e => {
-                    e.parentNode = b;
-                    e.parentNodeProperty = "body";
-                });
-                parent[parentProperty] = b;
-            }
-        } catch (e) {
-            console.log(`ERROR: ${parent.type} in property ${parentProperty}`, parent[parentProperty]);
-            throw e;
-        }    
-    }    
-}
-
-function createScopes(node, opts) {
-    let parent = node.parentNode;
-    let parentProperty = node.parentNodeProperty;
-    if (!parent) {
-        return;
-    }
-
-    if (["BlockStatement", "Program"].indexOf(node.type) > -1) {
-        if (config.verbose) {
-            console.log(`Scope Definition. Name: ${node.parentNode.type}`);
-        }
-        node._state = node._state || { scope: {} };
-        node._state.scope = node._state.scope || {};
-        _.each(node.body, n => {
-            if (n.type == "VariableDeclaration") {
-                _.each(n.declarations, declarationNode => {
-                    node._state.scope[declarationNode.id.name] = declarationNode.init || null;
-                    if (config.verbose) {
-                        console.log(`Defining ${declarationNode.id.name} of type ${(declarationNode.init || { type: "None" }).type} on scope`);
-                    }
-                });
-            } else if (n.type == "FunctionDeclaration") {
-                node._state.scope[n.id.name] = n;
-                if (config.verbose) {
-                    console.log(`Defining function ${n.id.name} on scope`);
-                }        
-            } else {
-                if (config.verbose) {
-                    console.log(`Node type: ${n.type}`);
-                }        
-            }    
-        });
-    }
-}
-
-function assignValuesToVariables(node, opts) {
-    let parent = node.parentNode;
-    let parentProperty = node.parentNodeProperty;
-    if (!parent) {
-        return;
-    }
-
-    if (/^Assignment(Expression|Pattern)$/.test(node.type) && node.left.type == "Identifier" && node.operator == "=") {
-        // if (config.verbose) {
-            console.log(`Populating values to variable ${node.left.name}.`);
-        // }
-        let scope = null;
-        let topNode = node;
-
-        while (topNode) {
-            if (topNode._state && topNode._state.scope) {
-                scope = topNode._state.scope;
-                if (node.left.name in scope) {
-                    break;
-                }
-            }
-            topNode = topNode.parentNode;
-        }
-
-        if (scope && node.left.name in scope) {
-            scope[node.left.name] = node.right;
-        } else {
-            if (!scope) {
-                console.log(`Scope is not defined for ${node.left.name}`);
-            } else {
-                console.log(`Cannot find definition of ${node.left.name} on parent scopes`);
-            }
-        }
-    }
-}
-
-function dumpScopes(node, opts) {
-    let parent = node.parentNode;
-    if (node._state && node._state.scope && Object.keys(node._state.scope).length > 0) {
-        let scope = "";
-        if (parent.type == "FunctionDeclaration") {
-            scope = " " + parent.id.name;
-        } else if (parent.type == "FunctionExpression" && parent.parentNode.type == "AssignmentExpression" && parent.parentNode.left.type == "Identifier") {
-            scope = " " + parent.parentNode.left.name;
-        }
-        console.log(`Scope${scope}:`);
-        _.each(node._state.scope, (val, key) => { 
-            console.log(`\tVariable ${key} ${val == null ? "is NOT USED" : "" }`);
-        });
-    }
-}

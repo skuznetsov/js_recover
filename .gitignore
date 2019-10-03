@@ -1,5 +1,8 @@
+data
 .vscode
+.DS_Store
 node_modules
 *.out
 *.old
 *.gen
+ast.*.json
