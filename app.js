@@ -25,17 +25,20 @@ const replaceSequentialAssignmentsInFlowControl = require("./lib/mutators/replac
 const replaceSequentialAssignments = require("./lib/mutators/replace_sequential_assignments");
 const fixControlFlowStatementsWithOneStatement = require("./lib/mutators/fix_control_flow_statements_with_one_statement");
 const removeLocationInformation = require("./lib/mutators/remove_location_information");
+const removeEmptyFunctions = require("./lib/mutators/remove_empty_functions");
+const defineFunctions = require("./lib/mutators/define_functions");
+const countFunctionInvocations = require("./lib/mutators/count_function_invocations");
 const recoverBooleans = require("./lib/mutators/recover_booleans");
-const removeParentNodes = require("./lib/mutators/remove_parent_nodes");
+const renameVariables = require("./lib/mutators/rename_variables");
 const Utils = require("./lib/utils");
 
-if (typeof(config.verbose) === "undefined" ) {
+if (typeof (config.verbose) === "undefined") {
     console.error(`ERROR: Cannot find config file at ${process.env.NODE_CONFIG_DIR}`);
     process.exit(1);
 }
 
-String.prototype.last = function() {
-  return this[this.length-1];  
+String.prototype.last = function () {
+    return this[this.length - 1];
 };
 
 const processingFileName = fs.realpathSync(process.argv[2] || config.defaultFileToProcess);
@@ -78,88 +81,95 @@ console.log(`Processing ${processingFileName}...`);
 //         resolve(null);
 //     }
 // }).then (smc => {
-    const ast = parser.parse(code, config.parser);
+const ast = parser.parse(code, config.parser);
 
-    // fs.writeFileSync('./ast.before.json', JSON.stringify(ast, null, 2));
+// fs.writeFileSync('./ast.before.json', JSON.stringify(ast, null, 2));
 
-    const jsGen = new CodeGenerator(ast, config.codeGenerator, "");
+const jsGen = new CodeGenerator(ast, config.codeGenerator, "");
 
-    // Pre-step
-    traverse(
+// Pre-step
+traverse(
+    ast,
+    [
+        removeLocationInformation,
+        defineFunctions,
+        countFunctionInvocations,
+        recoverBooleans,
+    ],
+    {
+        config
+    });
+
+while (true) {
+    if (!traverse(
         ast,
         [
-            removeLocationInformation,
-            recoverBooleans,
+            removeEmptyFunctions,
+            fixControlFlowStatementsWithOneStatement,
+            replaceSequentialAssignments,
+            replaceSequentialAssignmentsInFlowControl
         ],
         {
             config
-        });
-
-    while(true) {
-        if(!traverse(
-            ast,
-            [
-                fixControlFlowStatementsWithOneStatement,
-                removeLocationInformation,
-                replaceSequentialAssignments,
-                removeLocationInformation,
-                replaceSequentialAssignmentsInFlowControl,
-                removeLocationInformation,
-            ],
-            {
-                config
-            }
-        )) {
-            console.log('Traversing completed.');
-            break;
         }
-        console.log('Traversing...');
+    )) {
+        console.log('Traversing completed.');
+        break;
     }
+    console.log('Traversing...');
+}
 
-    // Painting of variables
-    traverse(
-        ast,
-        [
-            createScopes,
-            assignValuesToVariables,
-        ], {config});
-
-    traverse(ast, removeLocationInformation, {config});
-
-    // Dumping scopes of variables
-    traverse(ast,dumpScopes, {config});
-
-    // fs.writeFileSync('./ast.after.json', JSON.stringify(ast, (k,v) => ['parentNode', 'parentNodeProperty'].includes(k) ? null : v, 2));
-
-    if (config.verbose) {
-        console.log("Traversal finished.");
+for (let func in global.Functions) {
+    let funcNode = global.Functions[func];
+    // if (funcNode.callCount < 2) {
+    //     console.error(`Func ${func} called ${funcNode.callCount} times`);
+    // }
+    if (funcNode.type == "FunctionDeclaration" && (funcNode.isEmptyFunction || funcNode.callCount == 0)) {
+        Utils.removeChildFromParentNode(funcNode);
     }
-    
-    const outputFilePath = `${processingFileName}.out`;
+}
 
-    Utils.createAllFoldersInPath(outputFilePath);
+global.Functions = null;
+// Painting of variables
+// traverse(
+//     ast,
+//     [
+//         createScopes,
+//         assignValuesToVariables,
+//         renameVariables
+//     ], {config});
 
-    let res = null;
-    try {
-        console.log("Generating code...")    
-        res = jsGen.generate();
-        // res = generate(ast, {});
-    } catch(ex) {
-        console.log("ERROR:", ex.stack);
-    }
-    
-    if (res) {
-        console.log("Writing generated code...")    
-        
-        fs.writeFile(outputFilePath, res.code, err => {
-            if (err) {
-                console.log(`ERROR: Cannot save into ${outputFilePath}`);
-                throw err;
-            }
-            console.log(`Saving into ${outputFilePath}`);
-            process.exit(0);
-        });
-    }
+// Dumping scopes of variables
+// traverse(ast,dumpScopes, {config});
+
+fs.writeFileSync('./ast.after.json', JSON.stringify(ast, (k, v) => ['parentNode', 'parentNodeProperty'].includes(k) ? null : v, 2));
+// fs.writeFileSync('./scopes.json', JSON.stringify(global.astScopes, (k,v) => ['parent'].includes(k) ? null : v, 2));
+
+const outputFilePath = `${processingFileName}.out`;
+
+Utils.createAllFoldersInPath(outputFilePath);
+
+let res = null;
+try {
+    console.log("Generating code...")    
+    res = jsGen.generate();
+    // res = generate(ast, {});
+} catch(ex) {
+    console.log("ERROR:", ex.stack);
+}
+
+if (res) {
+    console.log("Writing generated code...")
+
+    fs.writeFile(outputFilePath, res.code, err => {
+        if (err) {
+            console.log(`ERROR: Cannot save into ${outputFilePath}`);
+            throw err;
+        }
+        console.log(`Saving into ${outputFilePath}`);
+        process.exit(0);
+    });
+}
 // }).catch( ex => {
 //     console.log("ERROR:", ex.stack);
 // });
