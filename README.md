@@ -8,7 +8,7 @@ Also it is useful for forensics to be sure that loaded code is not malitious.
 Tool consists of 3 components:
 1. JavaScript parser that generates Abstract Syntax Trees
 2. Mutators that modify AST as per requirements
-3. JavaScript generator that generates JS code fater AST was mutated.
+3. JavaScript generator that generates JS code after AST was mutated.
 
 ## Method of use
 
