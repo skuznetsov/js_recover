@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/generator": "^7.6.2",
-    "@babel/types": "^7.6.1",
+    "@babel/types": "^7.26.10",
     "babel-helper-fixtures": "^6.6.5",
     "babel-messages": "^6.7.2",
     "babel-runtime": "^5.0.0",
