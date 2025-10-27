@@ -10,7 +10,8 @@
       "Bash(find:*)",
       "Bash(awk:*)",
       "Read(//private/tmp/test_webpack_bundle.js.unpacked/**)",
-      "Read(//private/tmp/**)"
+      "Read(//private/tmp/**)",
+      "Bash(npm audit:*)"
     ],
     "deny": [],
     "ask": []

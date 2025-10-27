@@ -11,7 +11,6 @@ const fs = require('fs');
 // const parser = require('babylon');
 const parser = require('@babel/parser');
 const _ = require('lodash');
-const request = require('request');
 const readline = require('readline');
 const SourceMapConsumer = require('source-map').SourceMapConsumer;
 const CodeGenerator = require('@babel/generator').CodeGenerator;
