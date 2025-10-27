@@ -44,6 +44,7 @@ const unpackBundles = require("./lib/mutators/unpack_bundles");
 const simplifyPropertyAccess = require("./lib/mutators/simplify_property_access");
 const inlineStringArrayAccess = require("./lib/mutators/inline_string_array_access");
 const extractNestedBundles = require("./lib/mutators/extract_nested_bundles");
+const unwrapUMD = require("./lib/mutators/unwrap_umd");
 
 const Utils = require("./lib/utils");
 const GrokInterface = require("./lib/grok/interface");
@@ -297,15 +298,26 @@ const processingContext = {
 
 // Pre-step: Unpack bundles FIRST (before scope analysis)
 // This is critical for malware analysis - unpacks webpack/AMD/UMD bundles
-let status = traverseTopDown(
-    ast,
-    [
-        extractNestedBundles,  // Extract bundle-in-bundle strings first
-        unpackBundles,         // Then unwrap bundled code
-        removeLocationInformation
-    ],
-    processingContext
-);
+// Loop until convergence to handle UMD-wrapped bundles
+let status;
+let unpackIterations = 0;
+const MAX_UNPACK_ITERATIONS = 10;
+do {
+    unpackIterations++;
+    status = traverseTopDown(
+        ast,
+        [
+            unwrapUMD,             // Unwrap UMD wrappers first to expose inner bundles
+            extractNestedBundles,  // Extract bundle-in-bundle strings
+            unpackBundles,         // Then unwrap bundled code
+            removeLocationInformation
+        ],
+        processingContext
+    );
+    if (config.verbose && status) {
+        console.log(`  → Unpack iteration ${unpackIterations}: changes detected, continuing...`);
+    }
+} while (status && unpackIterations < MAX_UNPACK_ITERATIONS);
 
 status = traverseTopDown(
     ast,
