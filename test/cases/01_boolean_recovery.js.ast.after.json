@@ -1,0 +1,260 @@
+{
+  "type": "File",
+  "errors": [],
+  "program": {
+    "type": "Program",
+    "sourceType": "file",
+    "interpreter": null,
+    "body": [
+      {
+        "type": "FunctionDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "testBooleans"
+        },
+        "generator": false,
+        "async": false,
+        "params": [],
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "isTrue"
+                  },
+                  "init": {
+                    "type": "BooleanLiteral",
+                    "value": true
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "isFalse"
+                  },
+                  "init": {
+                    "type": "BooleanLiteral",
+                    "value": false
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "isUndefined"
+                  },
+                  "init": {
+                    "type": "Identifier",
+                    "name": "undefined"
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "CallExpression",
+                    "callee": {
+                      "type": "MemberExpression",
+                      "object": {
+                        "type": "Identifier",
+                        "name": "console"
+                      },
+                      "computed": false,
+                      "property": {
+                        "type": "Identifier",
+                        "name": "log"
+                      }
+                    },
+                    "arguments": [
+                      {
+                        "type": "StringLiteral",
+                        "extra": {
+                          "rawValue": "This should execute",
+                          "raw": "\"This should execute\""
+                        },
+                        "value": "This should execute"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "directives": [],
+              "_state_id": "b12ffc04-39d3-45b5-94fe-a98fd6a0e8e8"
+            },
+            {
+              "type": "EmptyStatement"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "result"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "extra": {
+                      "rawValue": "yes",
+                      "raw": "\"yes\""
+                    },
+                    "value": "yes"
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "ReturnStatement",
+              "argument": {
+                "type": "ObjectExpression",
+                "properties": [
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "isTrue"
+                    },
+                    "computed": false,
+                    "shorthand": false,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "isTrue"
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "isFalse"
+                    },
+                    "computed": false,
+                    "shorthand": false,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "isFalse"
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "isUndefined"
+                    },
+                    "computed": false,
+                    "shorthand": false,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "isUndefined"
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "result"
+                    },
+                    "computed": false,
+                    "shorthand": false,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "result"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "directives": [],
+          "_state_id": "dc304f9b-342b-47d2-9275-5e99a30c708d"
+        },
+        "trailingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Expected transformations:"
+          },
+          {
+            "type": "CommentLine",
+            "value": " !0 -> true"
+          },
+          {
+            "type": "CommentLine",
+            "value": " !1 -> false"
+          },
+          {
+            "type": "CommentLine",
+            "value": " void 0 -> undefined"
+          }
+        ],
+        "leadingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Test Case 1: Boolean Recovery"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Tests: !0 -> true, !1 -> false, void 0 -> undefined"
+          }
+        ],
+        "_state_id": "05fc8b77-05c7-4af4-970d-b3a16ad49316",
+        "callCount": 0
+      }
+    ],
+    "directives": [],
+    "_state_id": "639802f9-3d3e-4920-ba0b-5c39ee835594"
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " Test Case 1: Boolean Recovery"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Tests: !0 -> true, !1 -> false, void 0 -> undefined"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Expected transformations:"
+    },
+    {
+      "type": "CommentLine",
+      "value": " !0 -> true"
+    },
+    {
+      "type": "CommentLine",
+      "value": " !1 -> false"
+    },
+    {
+      "type": "CommentLine",
+      "value": " void 0 -> undefined"
+    }
+  ]
+}

@@ -1,0 +1,532 @@
+{
+  "type": "File",
+  "errors": [],
+  "program": {
+    "type": "Program",
+    "sourceType": "file",
+    "interpreter": null,
+    "body": [
+      {
+        "type": "FunctionDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "testControlFlow"
+        },
+        "generator": false,
+        "async": false,
+        "params": [
+          {
+            "type": "Identifier",
+            "name": "x"
+          }
+        ],
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "left": {
+                  "type": "Identifier",
+                  "name": "x"
+                },
+                "operator": ">",
+                "right": {
+                  "type": "NumericLiteral",
+                  "extra": {
+                    "rawValue": 0,
+                    "raw": "0"
+                  },
+                  "value": 0
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "console"
+                        },
+                        "computed": false,
+                        "property": {
+                          "type": "Identifier",
+                          "name": "log"
+                        }
+                      },
+                      "arguments": [
+                        {
+                          "type": "StringLiteral",
+                          "extra": {
+                            "rawValue": "positive",
+                            "raw": "\"positive\""
+                          },
+                          "value": "positive"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": null,
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Single statement if-else"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Single statement if"
+                }
+              ]
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "left": {
+                  "type": "Identifier",
+                  "name": "x"
+                },
+                "operator": ">",
+                "right": {
+                  "type": "NumericLiteral",
+                  "extra": {
+                    "rawValue": 10,
+                    "raw": "10"
+                  },
+                  "value": 10
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "console"
+                        },
+                        "computed": false,
+                        "property": {
+                          "type": "Identifier",
+                          "name": "log"
+                        }
+                      },
+                      "arguments": [
+                        {
+                          "type": "StringLiteral",
+                          "extra": {
+                            "rawValue": "large",
+                            "raw": "\"large\""
+                          },
+                          "value": "large"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "console"
+                        },
+                        "computed": false,
+                        "property": {
+                          "type": "Identifier",
+                          "name": "log"
+                        }
+                      },
+                      "arguments": [
+                        {
+                          "type": "StringLiteral",
+                          "extra": {
+                            "rawValue": "small",
+                            "raw": "\"small\""
+                          },
+                          "value": "small"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Single statement while"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Single statement if-else"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "i"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "extra": {
+                      "rawValue": 0,
+                      "raw": "0"
+                    },
+                    "value": 0
+                  }
+                }
+              ],
+              "kind": "var",
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Single statement while"
+                }
+              ]
+            },
+            {
+              "type": "WhileStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "left": {
+                  "type": "Identifier",
+                  "name": "i"
+                },
+                "operator": "<",
+                "right": {
+                  "type": "NumericLiteral",
+                  "extra": {
+                    "rawValue": 3,
+                    "raw": "3"
+                  },
+                  "value": 3
+                }
+              },
+              "body": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "UpdateExpression",
+                      "operator": "++",
+                      "prefix": false,
+                      "argument": {
+                        "type": "Identifier",
+                        "name": "i"
+                      }
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Single statement for"
+                }
+              ],
+              "_state_id": "9a86820b-c945-4e91-9573-ca44957eb298"
+            },
+            {
+              "type": "ForStatement",
+              "init": {
+                "type": "VariableDeclaration",
+                "declarations": [
+                  {
+                    "type": "VariableDeclarator",
+                    "id": {
+                      "type": "Identifier",
+                      "name": "j"
+                    },
+                    "init": {
+                      "type": "NumericLiteral",
+                      "extra": {
+                        "rawValue": 0,
+                        "raw": "0"
+                      },
+                      "value": 0
+                    }
+                  }
+                ],
+                "kind": "var"
+              },
+              "test": {
+                "type": "BinaryExpression",
+                "left": {
+                  "type": "Identifier",
+                  "name": "j"
+                },
+                "operator": "<",
+                "right": {
+                  "type": "NumericLiteral",
+                  "extra": {
+                    "rawValue": 5,
+                    "raw": "5"
+                  },
+                  "value": 5
+                }
+              },
+              "update": {
+                "type": "UpdateExpression",
+                "operator": "++",
+                "prefix": false,
+                "argument": {
+                  "type": "Identifier",
+                  "name": "j"
+                }
+              },
+              "body": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "console"
+                        },
+                        "computed": false,
+                        "property": {
+                          "type": "Identifier",
+                          "name": "log"
+                        }
+                      },
+                      "arguments": [
+                        {
+                          "type": "Identifier",
+                          "name": "j"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Nested single statements"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Single statement for"
+                }
+              ],
+              "_state_id": "e6f66846-3e67-467f-abf2-ab6fff65ce36"
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "left": {
+                  "type": "Identifier",
+                  "name": "x"
+                },
+                "operator": ">",
+                "right": {
+                  "type": "NumericLiteral",
+                  "extra": {
+                    "rawValue": 0,
+                    "raw": "0"
+                  },
+                  "value": 0
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "IfStatement",
+                    "test": {
+                      "type": "BinaryExpression",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "x"
+                      },
+                      "operator": "<",
+                      "right": {
+                        "type": "NumericLiteral",
+                        "extra": {
+                          "rawValue": 100,
+                          "raw": "100"
+                        },
+                        "value": 100
+                      }
+                    },
+                    "consequent": {
+                      "type": "BlockStatement",
+                      "body": [
+                        {
+                          "type": "ExpressionStatement",
+                          "expression": {
+                            "type": "CallExpression",
+                            "callee": {
+                              "type": "MemberExpression",
+                              "object": {
+                                "type": "Identifier",
+                                "name": "console"
+                              },
+                              "computed": false,
+                              "property": {
+                                "type": "Identifier",
+                                "name": "log"
+                              }
+                            },
+                            "arguments": [
+                              {
+                                "type": "StringLiteral",
+                                "extra": {
+                                  "rawValue": "in range",
+                                  "raw": "\"in range\""
+                                },
+                                "value": "in range"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "directives": []
+                    },
+                    "alternate": null
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": null,
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Nested single statements"
+                }
+              ]
+            },
+            {
+              "type": "ReturnStatement",
+              "argument": {
+                "type": "BinaryExpression",
+                "left": {
+                  "type": "Identifier",
+                  "name": "i"
+                },
+                "operator": "+",
+                "right": {
+                  "type": "Identifier",
+                  "name": "j"
+                }
+              }
+            }
+          ],
+          "directives": [],
+          "_state_id": "9747e727-557c-4c54-a8f5-6bd06d438f5a"
+        },
+        "trailingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Expected transformations:"
+          },
+          {
+            "type": "CommentLine",
+            "value": " if (x > 0) console.log(\"positive\") -> if (x > 0) { console.log(\"positive\"); }"
+          },
+          {
+            "type": "CommentLine",
+            "value": " All single-statement control flow should be wrapped in blocks"
+          }
+        ],
+        "leadingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Test Case 3: Control Flow Normalization"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Tests: Single-statement if/while/for -> block statements"
+          }
+        ],
+        "_state_id": "e28ca251-2db9-46ad-be8e-d9be3df91451",
+        "callCount": 0
+      }
+    ],
+    "directives": [],
+    "_state_id": "7da18039-61e4-403f-89d0-e6b958b029ec"
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " Test Case 3: Control Flow Normalization"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Tests: Single-statement if/while/for -> block statements"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Single statement if"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Single statement if-else"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Single statement while"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Single statement for"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Nested single statements"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Expected transformations:"
+    },
+    {
+      "type": "CommentLine",
+      "value": " if (x > 0) console.log(\"positive\") -> if (x > 0) { console.log(\"positive\"); }"
+    },
+    {
+      "type": "CommentLine",
+      "value": " All single-statement control flow should be wrapped in blocks"
+    }
+  ]
+}

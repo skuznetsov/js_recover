@@ -1,0 +1,20 @@
+{
+    "verbose": true,
+    "defaultFileToProcess": "data/loader.js",
+    "sourceMaps": {
+        "use": false,
+        "saveOriginals": false,
+        "defaultOutputFolder": "./output"
+    },
+    "parser": {
+        "sourceType": "file",
+        "plugins": [
+    	    "asyncFunctions",
+	        "jsx",
+    	    "flow"
+	    ]
+    },
+    "codeGenerator": {
+	"bsd": true
+    }
+}

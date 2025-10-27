@@ -1,0 +1,26 @@
+{
+  "verbose": true,
+  "defaultFileToProcess": "data/loader.js",
+  "sourceMaps": {
+    "use": false,
+    "saveOriginals": false,
+    "defaultOutputFolder": "./output"
+  },
+  "parser": {
+    "sourceType": "file",
+    "plugins": [
+      "asyncFunctions",
+      "jsx",
+      "flow"
+    ]
+  },
+  "codeGenerator": {
+    "bsd": true
+  },
+  "maxIterations": 100,
+  "timeoutMs": 300000,
+  "maxAstNodes": 1000000,
+  "maxAstDepth": 500,
+  "dumpAST": false,
+  "unpackBundles": true
+}

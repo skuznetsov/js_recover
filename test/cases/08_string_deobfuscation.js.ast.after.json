@@ -1,0 +1,614 @@
+{
+  "type": "File",
+  "errors": [],
+  "program": {
+    "type": "Program",
+    "sourceType": "file",
+    "interpreter": null,
+    "body": [
+      {
+        "type": "FunctionDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "testStringDeobfuscation"
+        },
+        "generator": false,
+        "async": false,
+        "params": [],
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "hexString"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "Hello"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"Hello\""
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Hex escapes"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "hexMixed"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "World"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"World\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Unicode escapes"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"Hello\""
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "unicodeString"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "Hello"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"Hello\""
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"World\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Unicode escapes"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "unicodeMixed"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "Test"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"Test\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Octal escapes"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"Hello\""
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "octalString"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "Hello"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"Hello\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Mixed escapes"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"Test\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Octal escapes"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "mixedEscapes"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "Hello"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"Hello\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Preserve legitimate escapes"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"Hello\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Mixed escapes"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "withNewline"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "extra": {
+                      "rawValue": "Line1\nLine2",
+                      "raw": "\"Line1\\nLine2\""
+                    },
+                    "value": "Line1\nLine2"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Should keep \\n"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " \"Hello\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Preserve legitimate escapes"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "withTab"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "extra": {
+                      "rawValue": "Col1\tCol2",
+                      "raw": "\"Col1\\tCol2\""
+                    },
+                    "value": "Col1\tCol2"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Should keep \\t"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Should keep \\n"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "withQuote"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "extra": {
+                      "rawValue": "He said \"Hi\"",
+                      "raw": "\"He said \\\"Hi\\\"\""
+                    },
+                    "value": "He said \"Hi\""
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Should keep \\\""
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Should keep \\t"
+                }
+              ]
+            },
+            {
+              "type": "ReturnStatement",
+              "argument": {
+                "type": "ObjectExpression",
+                "properties": [
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "hexString"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "hexString"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "hexMixed"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "hexMixed"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "unicodeString"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "unicodeString"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "unicodeMixed"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "unicodeMixed"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "octalString"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "octalString"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "mixedEscapes"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "mixedEscapes"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "withNewline"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "withNewline"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "withTab"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "withTab"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "withQuote"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "withQuote"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  }
+                ]
+              },
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Should keep \\\""
+                }
+              ]
+            }
+          ],
+          "directives": [],
+          "_state_id": "afb4cd5d-eab4-4d62-822d-43e907ea5aca"
+        },
+        "trailingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Expected transformations:"
+          },
+          {
+            "type": "CommentLine",
+            "value": " \"\\x48\\x65\\x6c\\x6c\\x6f\" → \"Hello\""
+          },
+          {
+            "type": "CommentLine",
+            "value": " \"\\u0048\\u0065\\u006c\\u006c\\u006f\" → \"Hello\""
+          },
+          {
+            "type": "CommentLine",
+            "value": " Preserve: \\n, \\t, \\\", \\'"
+          }
+        ],
+        "leadingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Test Case 8: String Deobfuscation"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Tests: Hex, Unicode, Octal escape sequences"
+          }
+        ],
+        "_state_id": "43559a83-b842-4957-980a-a5b0234e1a26",
+        "callCount": 0
+      }
+    ],
+    "directives": [],
+    "_state_id": "ccc317e4-5846-40c5-98f2-4c74f8542d27"
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " Test Case 8: String Deobfuscation"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Tests: Hex, Unicode, Octal escape sequences"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Hex escapes"
+    },
+    {
+      "type": "CommentLine",
+      "value": " \"Hello\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " \"World\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " Unicode escapes"
+    },
+    {
+      "type": "CommentLine",
+      "value": " \"Hello\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " \"Test\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " Octal escapes"
+    },
+    {
+      "type": "CommentLine",
+      "value": " \"Hello\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " Mixed escapes"
+    },
+    {
+      "type": "CommentLine",
+      "value": " \"Hello\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " Preserve legitimate escapes"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should keep \\n"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should keep \\t"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should keep \\\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " Expected transformations:"
+    },
+    {
+      "type": "CommentLine",
+      "value": " \"\\x48\\x65\\x6c\\x6c\\x6f\" → \"Hello\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " \"\\u0048\\u0065\\u006c\\u006c\\u006f\" → \"Hello\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " Preserve: \\n, \\t, \\\", \\'"
+    }
+  ]
+}

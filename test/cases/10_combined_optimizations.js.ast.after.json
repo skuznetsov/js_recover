@@ -1,0 +1,550 @@
+{
+  "type": "File",
+  "errors": [],
+  "program": {
+    "type": "Program",
+    "sourceType": "file",
+    "interpreter": null,
+    "body": [
+      {
+        "type": "FunctionDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "testCombined"
+        },
+        "generator": false,
+        "async": false,
+        "params": [],
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "obfuscatedMsg"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "Hello"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " → \"Hello\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Phase 2: Constant folding"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Phase 1: String deobfuscation"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "computed"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 11
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " → 11 (if operator precedence handled)"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " → \"Hello\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Phase 2: Constant folding"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "concatStr"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "Result: 15"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " → \"Result: 15\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Phase 3: Dead code elimination (after constants folded)"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " → 11 (if operator precedence handled)"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "result"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "extra": {
+                      "rawValue": 0,
+                      "raw": "0"
+                    },
+                    "value": 0
+                  }
+                }
+              ],
+              "kind": "var",
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " → \"Result: 15\""
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Phase 3: Dead code elimination (after constants folded)"
+                }
+              ]
+            },
+            {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "AssignmentExpression",
+                    "operator": "=",
+                    "left": {
+                      "type": "Identifier",
+                      "name": "result"
+                    },
+                    "right": {
+                      "type": "NumericLiteral",
+                      "extra": {
+                        "rawValue": 100,
+                        "raw": "100"
+                      },
+                      "value": 100
+                    }
+                  },
+                  "leadingComments": [
+                    {
+                      "type": "CommentLine",
+                      "value": " → if (true) after folding"
+                    }
+                  ]
+                }
+              ],
+              "directives": [],
+              "_state_id": "d128fdd7-ae72-4631-8e0b-0427ebb15b03"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "complexString"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "ABC"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " → \"ABC\""
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Complex: String + Const + DCE"
+                }
+              ]
+            },
+            {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "AssignmentExpression",
+                    "operator": "+=",
+                    "left": {
+                      "type": "Identifier",
+                      "name": "complexString"
+                    },
+                    "right": {
+                      "type": "StringLiteral",
+                      "extra": {
+                        "rawValue": "D",
+                        "raw": "\"D\""
+                      },
+                      "value": "D"
+                    }
+                  },
+                  "leadingComments": [
+                    {
+                      "type": "CommentLine",
+                      "value": " → if (true)"
+                    }
+                  ]
+                }
+              ],
+              "directives": [],
+              "_state_id": "d08b13df-1651-4e61-b470-b4cac04c0f67"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "nested"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 10
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Step 1: true || false → true"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Step 2: true ? X : Y → X"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Step 3: 5 + 5 → 10"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Final: var nested = 10"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Nested optimization opportunities"
+                }
+              ]
+            },
+            {
+              "type": "ReturnStatement",
+              "argument": {
+                "type": "ObjectExpression",
+                "properties": [
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "obfuscatedMsg"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "obfuscatedMsg"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "computed"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "computed"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "concatStr"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "concatStr"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "result"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "result"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "complexString"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "complexString"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "nested"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "nested"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  }
+                ]
+              },
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Step 1: true || false → true"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Step 2: true ? X : Y → X"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Step 3: 5 + 5 → 10"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Final: var nested = 10"
+                }
+              ]
+            }
+          ],
+          "directives": [],
+          "_state_id": "789832d4-8056-4c37-9cd6-2ac3f9847a79"
+        },
+        "trailingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Expected transformation sequence:"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Iteration 1: String deobfuscation, some constant folding"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Iteration 2: More constant folding, dead code elimination"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Iteration 3: Final cleanup"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Should converge in 2-3 iterations"
+          }
+        ],
+        "leadingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Test Case 10: Combined Optimizations"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Tests: Constant folding + DCE + String deobfuscation working together"
+          }
+        ],
+        "_state_id": "5024bb58-95aa-4f66-9433-e1e94b049454",
+        "callCount": 0
+      }
+    ],
+    "directives": [],
+    "_state_id": "1070ad95-3791-4663-9d41-a4ee996f919c"
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " Test Case 10: Combined Optimizations"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Tests: Constant folding + DCE + String deobfuscation working together"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Phase 1: String deobfuscation"
+    },
+    {
+      "type": "CommentLine",
+      "value": " → \"Hello\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " Phase 2: Constant folding"
+    },
+    {
+      "type": "CommentLine",
+      "value": " → 11 (if operator precedence handled)"
+    },
+    {
+      "type": "CommentLine",
+      "value": " → \"Result: 15\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " Phase 3: Dead code elimination (after constants folded)"
+    },
+    {
+      "type": "CommentLine",
+      "value": " → if (true) after folding"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Dead code after if(true) simplification"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Complex: String + Const + DCE"
+    },
+    {
+      "type": "CommentLine",
+      "value": " → \"ABC\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " → if (true)"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Nested optimization opportunities"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Step 1: true || false → true"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Step 2: true ? X : Y → X"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Step 3: 5 + 5 → 10"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Final: var nested = 10"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Expected transformation sequence:"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Iteration 1: String deobfuscation, some constant folding"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Iteration 2: More constant folding, dead code elimination"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Iteration 3: Final cleanup"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should converge in 2-3 iterations"
+    }
+  ]
+}

@@ -1,0 +1,786 @@
+{
+  "type": "File",
+  "errors": [],
+  "program": {
+    "type": "Program",
+    "sourceType": "file",
+    "interpreter": null,
+    "body": [
+      {
+        "type": "FunctionDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "testConstantFolding"
+        },
+        "generator": false,
+        "async": false,
+        "params": [],
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "sum"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 5
+                  }
+                }
+              ],
+              "kind": "var",
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Arithmetic"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "product"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 20
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "division"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 20
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "modulo"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 2
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "power"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 1024
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Nested arithmetic"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "complex"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 15
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " String concatenation"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Nested arithmetic"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "greeting"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "Hello World"
+                  }
+                }
+              ],
+              "kind": "var",
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " String concatenation"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "mixed"
+                  },
+                  "init": {
+                    "type": "StringLiteral",
+                    "value": "Count: 10"
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Boolean operations"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "andOp"
+                  },
+                  "init": {
+                    "type": "BooleanLiteral",
+                    "value": false
+                  }
+                }
+              ],
+              "kind": "var",
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Boolean operations"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "orOp"
+                  },
+                  "init": {
+                    "type": "BooleanLiteral",
+                    "value": true
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "notOp"
+                  },
+                  "init": {
+                    "type": "BooleanLiteral",
+                    "value": false
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Comparison"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "greater"
+                  },
+                  "init": {
+                    "type": "BooleanLiteral",
+                    "value": true
+                  }
+                }
+              ],
+              "kind": "var",
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Comparison"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "less"
+                  },
+                  "init": {
+                    "type": "BooleanLiteral",
+                    "value": false
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "equal"
+                  },
+                  "init": {
+                    "type": "BooleanLiteral",
+                    "value": true
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Bitwise"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "bitwiseOr"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 12
+                  }
+                }
+              ],
+              "kind": "var",
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Bitwise"
+                }
+              ]
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "bitwiseAnd"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 4
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "shift"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "value": 8
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "ReturnStatement",
+              "argument": {
+                "type": "ObjectExpression",
+                "properties": [
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "sum"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "sum"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "product"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "product"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "division"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "division"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "modulo"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "modulo"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "power"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "power"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "complex"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "complex"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "greeting"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "greeting"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "mixed"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "mixed"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "andOp"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "andOp"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "orOp"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "orOp"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "notOp"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "notOp"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "greater"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "greater"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "less"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "less"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "equal"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "equal"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "bitwiseOr"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "bitwiseOr"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "bitwiseAnd"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "bitwiseAnd"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "shift"
+                    },
+                    "computed": false,
+                    "shorthand": true,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "shift"
+                    },
+                    "extra": {
+                      "shorthand": true
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "directives": [],
+          "_state_id": "d3cffad6-e21b-4e8b-afd0-60971bf54021"
+        },
+        "trailingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Expected transformations:"
+          },
+          {
+            "type": "CommentLine",
+            "value": " 2 + 3 → 5"
+          },
+          {
+            "type": "CommentLine",
+            "value": " 10 * 2 → 20"
+          },
+          {
+            "type": "CommentLine",
+            "value": " 100 / 5 → 20"
+          },
+          {
+            "type": "CommentLine",
+            "value": " \"Hello\" + \" \" + \"World\" → \"Hello World\""
+          },
+          {
+            "type": "CommentLine",
+            "value": " true && false → false"
+          },
+          {
+            "type": "CommentLine",
+            "value": " 10 > 5 → true"
+          }
+        ],
+        "leadingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Test Case 7: Constant Folding"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Tests: Arithmetic, string concat, boolean ops"
+          }
+        ],
+        "_state_id": "44fa8c20-30ee-46c1-8b07-678afff66db9",
+        "callCount": 0
+      }
+    ],
+    "directives": [],
+    "_state_id": "3bed4363-a8c4-4a20-9443-212440dcb37c"
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " Test Case 7: Constant Folding"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Tests: Arithmetic, string concat, boolean ops"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Arithmetic"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Nested arithmetic"
+    },
+    {
+      "type": "CommentLine",
+      "value": " String concatenation"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Boolean operations"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Comparison"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Bitwise"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Expected transformations:"
+    },
+    {
+      "type": "CommentLine",
+      "value": " 2 + 3 → 5"
+    },
+    {
+      "type": "CommentLine",
+      "value": " 10 * 2 → 20"
+    },
+    {
+      "type": "CommentLine",
+      "value": " 100 / 5 → 20"
+    },
+    {
+      "type": "CommentLine",
+      "value": " \"Hello\" + \" \" + \"World\" → \"Hello World\""
+    },
+    {
+      "type": "CommentLine",
+      "value": " true && false → false"
+    },
+    {
+      "type": "CommentLine",
+      "value": " 10 > 5 → true"
+    }
+  ]
+}

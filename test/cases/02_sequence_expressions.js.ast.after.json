@@ -1,0 +1,415 @@
+{
+  "type": "File",
+  "errors": [],
+  "program": {
+    "type": "Program",
+    "sourceType": "file",
+    "interpreter": null,
+    "body": [
+      {
+        "type": "FunctionDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "testSequences"
+        },
+        "generator": false,
+        "async": false,
+        "params": [],
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "a"
+                  },
+                  "init": null
+                },
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "b"
+                  },
+                  "init": null
+                },
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "c"
+                  },
+                  "init": null
+                },
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "d"
+                  },
+                  "init": null
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Simple sequence expression"
+                }
+              ]
+            },
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                  "type": "Identifier",
+                  "name": "a"
+                },
+                "right": {
+                  "type": "NumericLiteral",
+                  "extra": {
+                    "rawValue": 1,
+                    "raw": "1"
+                  },
+                  "value": 1
+                }
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                  "type": "Identifier",
+                  "name": "b"
+                },
+                "right": {
+                  "type": "NumericLiteral",
+                  "extra": {
+                    "rawValue": 2,
+                    "raw": "2"
+                  },
+                  "value": 2
+                }
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                  "type": "Identifier",
+                  "name": "c"
+                },
+                "right": {
+                  "type": "NumericLiteral",
+                  "extra": {
+                    "rawValue": 3,
+                    "raw": "3"
+                  },
+                  "value": 3
+                }
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                  "type": "Identifier",
+                  "name": "d"
+                },
+                "right": {
+                  "type": "SequenceExpression",
+                  "expressions": [
+                    {
+                      "type": "AssignmentExpression",
+                      "operator": "=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "a"
+                      },
+                      "right": {
+                        "type": "NumericLiteral",
+                        "extra": {
+                          "rawValue": 10,
+                          "raw": "10"
+                        },
+                        "value": 10
+                      }
+                    },
+                    {
+                      "type": "AssignmentExpression",
+                      "operator": "=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "b"
+                      },
+                      "right": {
+                        "type": "NumericLiteral",
+                        "extra": {
+                          "rawValue": 20,
+                          "raw": "20"
+                        },
+                        "value": 20
+                      }
+                    },
+                    {
+                      "type": "BinaryExpression",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "a"
+                      },
+                      "operator": "+",
+                      "right": {
+                        "type": "Identifier",
+                        "name": "b"
+                      }
+                    }
+                  ],
+                  "extra": {
+                    "parenthesized": true,
+                    "parenStart": 235
+                  }
+                }
+              },
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Sequence with function calls"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Sequence in assignment"
+                }
+              ]
+            },
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "CallExpression",
+                "callee": {
+                  "type": "MemberExpression",
+                  "object": {
+                    "type": "Identifier",
+                    "name": "console"
+                  },
+                  "computed": false,
+                  "property": {
+                    "type": "Identifier",
+                    "name": "log"
+                  }
+                },
+                "arguments": [
+                  {
+                    "type": "StringLiteral",
+                    "extra": {
+                      "rawValue": "first",
+                      "raw": "\"first\""
+                    },
+                    "value": "first"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "CallExpression",
+                "callee": {
+                  "type": "MemberExpression",
+                  "object": {
+                    "type": "Identifier",
+                    "name": "console"
+                  },
+                  "computed": false,
+                  "property": {
+                    "type": "Identifier",
+                    "name": "log"
+                  }
+                },
+                "arguments": [
+                  {
+                    "type": "StringLiteral",
+                    "extra": {
+                      "rawValue": "second",
+                      "raw": "\"second\""
+                    },
+                    "value": "second"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "CallExpression",
+                "callee": {
+                  "type": "MemberExpression",
+                  "object": {
+                    "type": "Identifier",
+                    "name": "console"
+                  },
+                  "computed": false,
+                  "property": {
+                    "type": "Identifier",
+                    "name": "log"
+                  }
+                },
+                "arguments": [
+                  {
+                    "type": "StringLiteral",
+                    "extra": {
+                      "rawValue": "third",
+                      "raw": "\"third\""
+                    },
+                    "value": "third"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "ReturnStatement",
+              "argument": {
+                "type": "ObjectExpression",
+                "properties": [
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "a"
+                    },
+                    "computed": false,
+                    "shorthand": false,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "a"
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "b"
+                    },
+                    "computed": false,
+                    "shorthand": false,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "b"
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "c"
+                    },
+                    "computed": false,
+                    "shorthand": false,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "c"
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "method": false,
+                    "key": {
+                      "type": "Identifier",
+                      "name": "d"
+                    },
+                    "computed": false,
+                    "shorthand": false,
+                    "value": {
+                      "type": "Identifier",
+                      "name": "d"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "directives": [],
+          "_state_id": "75ed00e7-9657-47d5-9fce-4f73e2d27acb"
+        },
+        "trailingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Expected transformations:"
+          },
+          {
+            "type": "CommentLine",
+            "value": " (a=1, b=2, c=3) -> a=1; b=2; c=3;"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Sequence expressions should be expanded into separate statements"
+          }
+        ],
+        "leadingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Test Case 2: Sequence Expressions"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Tests: (a=1, b=2, c=3) -> separate statements"
+          }
+        ],
+        "_state_id": "1275ed1e-455e-464c-95e7-5363522a654e",
+        "callCount": 0
+      }
+    ],
+    "directives": [],
+    "_state_id": "02aa86b3-3289-473f-adbf-04a4bec045b0"
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " Test Case 2: Sequence Expressions"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Tests: (a=1, b=2, c=3) -> separate statements"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Simple sequence expression"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Sequence in assignment"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Sequence with function calls"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Expected transformations:"
+    },
+    {
+      "type": "CommentLine",
+      "value": " (a=1, b=2, c=3) -> a=1; b=2; c=3;"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Sequence expressions should be expanded into separate statements"
+    }
+  ]
+}

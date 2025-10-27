@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__agents-assembly-v3__knowledge",
+      "Bash(node test/run_tests.js:*)",
+      "Bash(node app.js:*)",
+      "Bash(cat:*)",
+      "Read(//Users/sergey/Projects/ML/agents_assembly/llm_interfaces/**)",
+      "Read(//Users/sergey/Projects/ML/agents_assembly/core/**)",
+      "Bash(find:*)",
+      "Bash(awk:*)",
+      "Read(//private/tmp/test_webpack_bundle.js.unpacked/**)",
+      "Read(//private/tmp/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

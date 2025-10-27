@@ -1,0 +1,416 @@
+{
+  "type": "File",
+  "errors": [],
+  "program": {
+    "type": "Program",
+    "sourceType": "file",
+    "interpreter": null,
+    "body": [
+      {
+        "type": "FunctionDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "testLogicalOperators"
+        },
+        "generator": false,
+        "async": false,
+        "params": [
+          {
+            "type": "Identifier",
+            "name": "flag"
+          }
+        ],
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "result"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "extra": {
+                      "rawValue": 0,
+                      "raw": "0"
+                    },
+                    "value": 0
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Logical AND as conditional"
+                }
+              ]
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "Identifier",
+                "name": "flag"
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "AssignmentExpression",
+                      "operator": "=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "result"
+                      },
+                      "right": {
+                        "type": "NumericLiteral",
+                        "extra": {
+                          "rawValue": 10,
+                          "raw": "10"
+                        },
+                        "value": 10
+                      },
+                      "extra": {
+                        "parenthesized": true,
+                        "parenStart": 212
+                      }
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "UnaryExpression",
+                "operator": "!",
+                "argument": {
+                  "type": "Identifier",
+                  "name": "flag"
+                },
+                "prefix": true
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "AssignmentExpression",
+                      "operator": "=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "result"
+                      },
+                      "right": {
+                        "type": "NumericLiteral",
+                        "extra": {
+                          "rawValue": 20,
+                          "raw": "20"
+                        },
+                        "value": 20
+                      },
+                      "extra": {
+                        "parenthesized": true,
+                        "parenStart": 273
+                      }
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "Identifier",
+                "name": "flag"
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "console"
+                        },
+                        "computed": false,
+                        "property": {
+                          "type": "Identifier",
+                          "name": "log"
+                        }
+                      },
+                      "arguments": [
+                        {
+                          "type": "StringLiteral",
+                          "extra": {
+                            "rawValue": "flag is true",
+                            "raw": "\"flag is true\""
+                          },
+                          "value": "flag is true"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "UnaryExpression",
+                "operator": "!",
+                "argument": {
+                  "type": "Identifier",
+                  "name": "flag"
+                },
+                "prefix": true
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "console"
+                        },
+                        "computed": false,
+                        "property": {
+                          "type": "Identifier",
+                          "name": "log"
+                        }
+                      },
+                      "arguments": [
+                        {
+                          "type": "StringLiteral",
+                          "extra": {
+                            "rawValue": "flag is false",
+                            "raw": "\"flag is false\""
+                          },
+                          "value": "flag is false"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "Identifier",
+                "name": "flag"
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "UpdateExpression",
+                      "operator": "++",
+                      "prefix": false,
+                      "argument": {
+                        "type": "Identifier",
+                        "name": "result"
+                      }
+                    }
+                  },
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "console"
+                        },
+                        "computed": false,
+                        "property": {
+                          "type": "Identifier",
+                          "name": "log"
+                        }
+                      },
+                      "arguments": [
+                        {
+                          "type": "Identifier",
+                          "name": "result"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "LogicalExpression",
+                "left": {
+                  "type": "Identifier",
+                  "name": "flag"
+                },
+                "operator": "||",
+                "right": {
+                  "type": "BinaryExpression",
+                  "left": {
+                    "type": "Identifier",
+                    "name": "result"
+                  },
+                  "operator": "<",
+                  "right": {
+                    "type": "NumericLiteral",
+                    "extra": {
+                      "rawValue": 0,
+                      "raw": "0"
+                    },
+                    "value": 0
+                  }
+                },
+                "extra": {
+                  "parenthesized": true,
+                  "parenStart": 531
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "AssignmentExpression",
+                      "operator": "=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "result"
+                      },
+                      "right": {
+                        "type": "NumericLiteral",
+                        "extra": {
+                          "rawValue": 100,
+                          "raw": "100"
+                        },
+                        "value": 100
+                      },
+                      "extra": {
+                        "parenthesized": true,
+                        "parenStart": 555
+                      }
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": null
+            },
+            {
+              "type": "ReturnStatement",
+              "argument": {
+                "type": "Identifier",
+                "name": "result"
+              }
+            }
+          ],
+          "directives": [],
+          "_state_id": "f041d382-a105-4e69-849a-763e9197d963"
+        },
+        "trailingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Expected transformations:"
+          },
+          {
+            "type": "CommentLine",
+            "value": " flag && (result = 10) -> if (flag) { result = 10; }"
+          },
+          {
+            "type": "CommentLine",
+            "value": " flag || (result = 20) -> if (!flag) { result = 20; }"
+          }
+        ],
+        "leadingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Test Case 4: Logical Operators to Conditionals"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Tests: a && b() -> if(a) b(), a || b() -> if(!a) b()"
+          }
+        ],
+        "_state_id": "4e8d840d-cb19-43f4-81fe-776caeb368c8",
+        "callCount": 0
+      }
+    ],
+    "directives": [],
+    "_state_id": "3c241433-8863-4ad8-9032-1003e8069de8"
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " Test Case 4: Logical Operators to Conditionals"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Tests: a && b() -> if(a) b(), a || b() -> if(!a) b()"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Logical AND as conditional"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Logical OR as conditional"
+    },
+    {
+      "type": "CommentLine",
+      "value": " With function calls"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Chained logical operators with sequence"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Complex logical expression"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Expected transformations:"
+    },
+    {
+      "type": "CommentLine",
+      "value": " flag && (result = 10) -> if (flag) { result = 10; }"
+    },
+    {
+      "type": "CommentLine",
+      "value": " flag || (result = 20) -> if (!flag) { result = 20; }"
+    }
+  ]
+}

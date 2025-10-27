@@ -1,0 +1,714 @@
+{
+  "type": "File",
+  "errors": [],
+  "program": {
+    "type": "Program",
+    "sourceType": "file",
+    "interpreter": null,
+    "body": [
+      {
+        "type": "FunctionDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "convergenceTest"
+        },
+        "generator": false,
+        "async": false,
+        "params": [
+          {
+            "type": "Identifier",
+            "name": "n"
+          }
+        ],
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "result"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "extra": {
+                      "rawValue": 0,
+                      "raw": "0"
+                    },
+                    "value": 0
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " This requires multiple iterations to fully simplify"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Iteration 1: Expand outer sequence"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Iteration 2: Convert logical to if"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Iteration 3: Expand inner sequences"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Iteration 4: Normalize control flow"
+                }
+              ]
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "left": {
+                  "type": "Identifier",
+                  "name": "n"
+                },
+                "operator": ">",
+                "right": {
+                  "type": "NumericLiteral",
+                  "extra": {
+                    "rawValue": 0,
+                    "raw": "0"
+                  },
+                  "value": 0
+                },
+                "extra": {
+                  "parenthesized": true,
+                  "parenStart": 383
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "SequenceExpression",
+                      "expressions": [
+                        {
+                          "type": "AssignmentExpression",
+                          "operator": "=",
+                          "left": {
+                            "type": "Identifier",
+                            "name": "result"
+                          },
+                          "right": {
+                            "type": "NumericLiteral",
+                            "extra": {
+                              "rawValue": 10,
+                              "raw": "10"
+                            },
+                            "value": 10
+                          }
+                        },
+                        {
+                          "type": "CallExpression",
+                          "callee": {
+                            "type": "MemberExpression",
+                            "object": {
+                              "type": "Identifier",
+                              "name": "console"
+                            },
+                            "computed": false,
+                            "property": {
+                              "type": "Identifier",
+                              "name": "log"
+                            }
+                          },
+                          "arguments": [
+                            {
+                              "type": "StringLiteral",
+                              "extra": {
+                                "rawValue": "step1",
+                                "raw": "\"step1\""
+                              },
+                              "value": "step1"
+                            }
+                          ]
+                        }
+                      ],
+                      "extra": {
+                        "parenthesized": true,
+                        "parenStart": 404
+                      }
+                    }
+                  },
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "SequenceExpression",
+                      "expressions": [
+                        {
+                          "type": "AssignmentExpression",
+                          "operator": "+=",
+                          "left": {
+                            "type": "Identifier",
+                            "name": "result"
+                          },
+                          "right": {
+                            "type": "NumericLiteral",
+                            "extra": {
+                              "rawValue": 20,
+                              "raw": "20"
+                            },
+                            "value": 20
+                          }
+                        },
+                        {
+                          "type": "CallExpression",
+                          "callee": {
+                            "type": "MemberExpression",
+                            "object": {
+                              "type": "Identifier",
+                              "name": "console"
+                            },
+                            "computed": false,
+                            "property": {
+                              "type": "Identifier",
+                              "name": "log"
+                            }
+                          },
+                          "arguments": [
+                            {
+                              "type": "StringLiteral",
+                              "extra": {
+                                "rawValue": "step2",
+                                "raw": "\"step2\""
+                              },
+                              "value": "step2"
+                            }
+                          ]
+                        }
+                      ],
+                      "extra": {
+                        "parenthesized": true,
+                        "parenStart": 449
+                      }
+                    }
+                  },
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "LogicalExpression",
+                      "left": {
+                        "type": "BinaryExpression",
+                        "left": {
+                          "type": "Identifier",
+                          "name": "n"
+                        },
+                        "operator": ">",
+                        "right": {
+                          "type": "NumericLiteral",
+                          "extra": {
+                            "rawValue": 10,
+                            "raw": "10"
+                          },
+                          "value": 10
+                        }
+                      },
+                      "operator": "&&",
+                      "right": {
+                        "type": "SequenceExpression",
+                        "expressions": [
+                          {
+                            "type": "AssignmentExpression",
+                            "operator": "*=",
+                            "left": {
+                              "type": "Identifier",
+                              "name": "result"
+                            },
+                            "right": {
+                              "type": "NumericLiteral",
+                              "extra": {
+                                "rawValue": 2,
+                                "raw": "2"
+                              },
+                              "value": 2
+                            }
+                          },
+                          {
+                            "type": "CallExpression",
+                            "callee": {
+                              "type": "MemberExpression",
+                              "object": {
+                                "type": "Identifier",
+                                "name": "console"
+                              },
+                              "computed": false,
+                              "property": {
+                                "type": "Identifier",
+                                "name": "log"
+                              }
+                            },
+                            "arguments": [
+                              {
+                                "type": "StringLiteral",
+                                "extra": {
+                                  "rawValue": "step3",
+                                  "raw": "\"step3\""
+                                },
+                                "value": "step3"
+                              }
+                            ]
+                          }
+                        ],
+                        "extra": {
+                          "parenthesized": true,
+                          "parenStart": 505
+                        }
+                      }
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BooleanLiteral",
+                "value": true
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "ConditionalExpression",
+                      "test": {
+                        "type": "BinaryExpression",
+                        "left": {
+                          "type": "Identifier",
+                          "name": "n"
+                        },
+                        "operator": ">",
+                        "right": {
+                          "type": "NumericLiteral",
+                          "extra": {
+                            "rawValue": 5,
+                            "raw": "5"
+                          },
+                          "value": 5
+                        }
+                      },
+                      "consequent": {
+                        "type": "SequenceExpression",
+                        "expressions": [
+                          {
+                            "type": "SequenceExpression",
+                            "expressions": [
+                              {
+                                "type": "UpdateExpression",
+                                "operator": "++",
+                                "prefix": false,
+                                "argument": {
+                                  "type": "Identifier",
+                                  "name": "result"
+                                }
+                              },
+                              {
+                                "type": "CallExpression",
+                                "callee": {
+                                  "type": "MemberExpression",
+                                  "object": {
+                                    "type": "Identifier",
+                                    "name": "console"
+                                  },
+                                  "computed": false,
+                                  "property": {
+                                    "type": "Identifier",
+                                    "name": "log"
+                                  }
+                                },
+                                "arguments": [
+                                  {
+                                    "type": "StringLiteral",
+                                    "extra": {
+                                      "rawValue": "branch1",
+                                      "raw": "\"branch1\""
+                                    },
+                                    "value": "branch1"
+                                  }
+                                ]
+                              }
+                            ],
+                            "extra": {
+                              "parenthesized": true,
+                              "parenStart": 667
+                            }
+                          },
+                          {
+                            "type": "AssignmentExpression",
+                            "operator": "+=",
+                            "left": {
+                              "type": "Identifier",
+                              "name": "result"
+                            },
+                            "right": {
+                              "type": "NumericLiteral",
+                              "extra": {
+                                "rawValue": 10,
+                                "raw": "10"
+                              },
+                              "value": 10
+                            }
+                          }
+                        ],
+                        "extra": {
+                          "parenthesized": true,
+                          "parenStart": 653
+                        }
+                      },
+                      "alternate": {
+                        "type": "SequenceExpression",
+                        "expressions": [
+                          {
+                            "type": "SequenceExpression",
+                            "expressions": [
+                              {
+                                "type": "UpdateExpression",
+                                "operator": "--",
+                                "prefix": false,
+                                "argument": {
+                                  "type": "Identifier",
+                                  "name": "result"
+                                }
+                              },
+                              {
+                                "type": "CallExpression",
+                                "callee": {
+                                  "type": "MemberExpression",
+                                  "object": {
+                                    "type": "Identifier",
+                                    "name": "console"
+                                  },
+                                  "computed": false,
+                                  "property": {
+                                    "type": "Identifier",
+                                    "name": "log"
+                                  }
+                                },
+                                "arguments": [
+                                  {
+                                    "type": "StringLiteral",
+                                    "extra": {
+                                      "rawValue": "branch2",
+                                      "raw": "\"branch2\""
+                                    },
+                                    "value": "branch2"
+                                  }
+                                ]
+                              }
+                            ],
+                            "extra": {
+                              "parenthesized": true,
+                              "parenStart": 754
+                            }
+                          },
+                          {
+                            "type": "AssignmentExpression",
+                            "operator": "-=",
+                            "left": {
+                              "type": "Identifier",
+                              "name": "result"
+                            },
+                            "right": {
+                              "type": "NumericLiteral",
+                              "extra": {
+                                "rawValue": 10,
+                                "raw": "10"
+                              },
+                              "value": 10
+                            }
+                          }
+                        ],
+                        "extra": {
+                          "parenthesized": true,
+                          "parenStart": 740
+                        }
+                      },
+                      "extra": {
+                        "parenthesized": true,
+                        "parenStart": 635
+                      }
+                    }
+                  }
+                ],
+                "directives": []
+              },
+              "alternate": null
+            },
+            {
+              "type": "ForStatement",
+              "init": {
+                "type": "VariableDeclaration",
+                "declarations": [
+                  {
+                    "type": "VariableDeclarator",
+                    "id": {
+                      "type": "Identifier",
+                      "name": "i"
+                    },
+                    "init": {
+                      "type": "SequenceExpression",
+                      "expressions": [
+                        {
+                          "type": "AssignmentExpression",
+                          "operator": "=",
+                          "left": {
+                            "type": "Identifier",
+                            "name": "result"
+                          },
+                          "right": {
+                            "type": "NumericLiteral",
+                            "extra": {
+                              "rawValue": 0,
+                              "raw": "0"
+                            },
+                            "value": 0
+                          }
+                        },
+                        {
+                          "type": "Identifier",
+                          "name": "n"
+                        }
+                      ],
+                      "extra": {
+                        "parenthesized": true,
+                        "parenStart": 909
+                      }
+                    }
+                  }
+                ],
+                "kind": "var"
+              },
+              "test": {
+                "type": "BinaryExpression",
+                "left": {
+                  "type": "Identifier",
+                  "name": "i"
+                },
+                "operator": ">",
+                "right": {
+                  "type": "NumericLiteral",
+                  "extra": {
+                    "rawValue": 0,
+                    "raw": "0"
+                  },
+                  "value": 0
+                }
+              },
+              "update": {
+                "type": "UpdateExpression",
+                "operator": "--",
+                "prefix": false,
+                "argument": {
+                  "type": "Identifier",
+                  "name": "i"
+                }
+              },
+              "body": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "IfStatement",
+                    "test": {
+                      "type": "BinaryExpression",
+                      "left": {
+                        "type": "BinaryExpression",
+                        "left": {
+                          "type": "Identifier",
+                          "name": "i"
+                        },
+                        "operator": "%",
+                        "right": {
+                          "type": "NumericLiteral",
+                          "extra": {
+                            "rawValue": 2,
+                            "raw": "2"
+                          },
+                          "value": 2
+                        }
+                      },
+                      "operator": "===",
+                      "right": {
+                        "type": "NumericLiteral",
+                        "extra": {
+                          "rawValue": 0,
+                          "raw": "0"
+                        },
+                        "value": 0
+                      }
+                    },
+                    "consequent": {
+                      "type": "BlockStatement",
+                      "body": [
+                        {
+                          "type": "ExpressionStatement",
+                          "expression": {
+                            "type": "AssignmentExpression",
+                            "operator": "+=",
+                            "left": {
+                              "type": "Identifier",
+                              "name": "result"
+                            },
+                            "right": {
+                              "type": "Identifier",
+                              "name": "i"
+                            }
+                          }
+                        },
+                        {
+                          "type": "ExpressionStatement",
+                          "expression": {
+                            "type": "CallExpression",
+                            "callee": {
+                              "type": "MemberExpression",
+                              "object": {
+                                "type": "Identifier",
+                                "name": "console"
+                              },
+                              "computed": false,
+                              "property": {
+                                "type": "Identifier",
+                                "name": "log"
+                              }
+                            },
+                            "arguments": [
+                              {
+                                "type": "Identifier",
+                                "name": "i"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "directives": []
+                    },
+                    "alternate": null
+                  }
+                ],
+                "directives": []
+              },
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Complex for loop requiring multiple simplifications"
+                }
+              ],
+              "_state_id": "586dbcb0-fb2e-430f-9c26-c5d3018c389d"
+            },
+            {
+              "type": "ReturnStatement",
+              "argument": {
+                "type": "Identifier",
+                "name": "result"
+              }
+            }
+          ],
+          "directives": [],
+          "_state_id": "50c481de-0469-4b92-a7b9-4334103fd9a0"
+        },
+        "trailingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Expected behavior:"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Should require 3-5 iterations to fully simplify"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Tests that convergence detection works correctly"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Should NOT hit MAX_ITERATIONS"
+          }
+        ],
+        "leadingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Test Case 6: Convergence Testing"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Tests: Iterative simplification requiring multiple passes"
+          }
+        ],
+        "_state_id": "8d59b9a2-3acd-4c3a-9f5a-b1926886d39b",
+        "callCount": 0
+      }
+    ],
+    "directives": [],
+    "_state_id": "bc436297-d415-4836-a7dc-ec53777fae76"
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " Test Case 6: Convergence Testing"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Tests: Iterative simplification requiring multiple passes"
+    },
+    {
+      "type": "CommentLine",
+      "value": " This requires multiple iterations to fully simplify"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Iteration 1: Expand outer sequence"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Iteration 2: Convert logical to if"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Iteration 3: Expand inner sequences"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Iteration 4: Normalize control flow"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Nested conditionals with sequences"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Complex for loop requiring multiple simplifications"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Expected behavior:"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should require 3-5 iterations to fully simplify"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Tests that convergence detection works correctly"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should NOT hit MAX_ITERATIONS"
+    }
+  ]
+}

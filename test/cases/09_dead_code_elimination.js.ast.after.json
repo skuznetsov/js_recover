@@ -1,0 +1,383 @@
+{
+  "type": "File",
+  "errors": [],
+  "program": {
+    "type": "Program",
+    "sourceType": "file",
+    "interpreter": null,
+    "body": [
+      {
+        "type": "FunctionDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "testDeadCodeElimination"
+        },
+        "generator": false,
+        "async": false,
+        "params": [
+          {
+            "type": "Identifier",
+            "name": "x"
+          }
+        ],
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "result"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "extra": {
+                      "rawValue": 0,
+                      "raw": "0"
+                    },
+                    "value": 0
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Dead if branch"
+                }
+              ]
+            },
+            {
+              "type": "EmptyStatement"
+            },
+            {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "AssignmentExpression",
+                    "operator": "=",
+                    "left": {
+                      "type": "Identifier",
+                      "name": "result"
+                    },
+                    "right": {
+                      "type": "NumericLiteral",
+                      "extra": {
+                        "rawValue": 100,
+                        "raw": "100"
+                      },
+                      "value": 100
+                    }
+                  }
+                }
+              ],
+              "directives": [],
+              "_state_id": "186513e1-102b-4b53-95d1-e09a5508ab5d"
+            },
+            {
+              "type": "EmptyStatement"
+            },
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "ternary"
+                  },
+                  "init": {
+                    "type": "NumericLiteral",
+                    "extra": {
+                      "rawValue": 2,
+                      "raw": "2"
+                    },
+                    "value": 2
+                  }
+                }
+              ],
+              "kind": "var",
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Should become: var ternary = 2"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Unreachable after return"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Dead ternary"
+                }
+              ]
+            },
+            {
+              "type": "FunctionDeclaration",
+              "id": {
+                "type": "Identifier",
+                "name": "unreachableCode"
+              },
+              "generator": false,
+              "async": false,
+              "params": [],
+              "body": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ReturnStatement",
+                    "argument": {
+                      "type": "NumericLiteral",
+                      "extra": {
+                        "rawValue": 42,
+                        "raw": "42"
+                      },
+                      "value": 42
+                    }
+                  }
+                ],
+                "directives": [],
+                "_state_id": "887033a3-2bab-45f9-a6f2-9415d8af78cf"
+              },
+              "trailingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Nested dead code"
+                }
+              ],
+              "leadingComments": [
+                {
+                  "type": "CommentLine",
+                  "value": " Should become: var ternary = 2"
+                },
+                {
+                  "type": "CommentLine",
+                  "value": " Unreachable after return"
+                }
+              ],
+              "_state_id": "9ce79c27-e831-4e36-abaf-0db65721698d",
+              "callCount": 0
+            },
+            {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "AssignmentExpression",
+                    "operator": "=",
+                    "left": {
+                      "type": "Identifier",
+                      "name": "result"
+                    },
+                    "right": {
+                      "type": "NumericLiteral",
+                      "extra": {
+                        "rawValue": 300,
+                        "raw": "300"
+                      },
+                      "value": 300
+                    }
+                  }
+                },
+                {
+                  "type": "EmptyStatement"
+                }
+              ],
+              "directives": [],
+              "_state_id": "cdaf2cda-bbb2-40aa-9218-18bfd3b6cced"
+            },
+            {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "AssignmentExpression",
+                    "operator": "+=",
+                    "left": {
+                      "type": "Identifier",
+                      "name": "result"
+                    },
+                    "right": {
+                      "type": "NumericLiteral",
+                      "extra": {
+                        "rawValue": 50,
+                        "raw": "50"
+                      },
+                      "value": 50
+                    }
+                  }
+                }
+              ],
+              "directives": [],
+              "_state_id": "16e0b709-98ea-4de0-8c85-216e06874c86"
+            },
+            {
+              "type": "ReturnStatement",
+              "argument": {
+                "type": "BinaryExpression",
+                "left": {
+                  "type": "Identifier",
+                  "name": "result"
+                },
+                "operator": "+",
+                "right": {
+                  "type": "CallExpression",
+                  "callee": {
+                    "type": "Identifier",
+                    "name": "unreachableCode"
+                  },
+                  "arguments": []
+                }
+              }
+            }
+          ],
+          "directives": [],
+          "_state_id": "2eceab5d-4461-4610-9d58-2e8275d85660"
+        },
+        "trailingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Expected transformations:"
+          },
+          {
+            "type": "CommentLine",
+            "value": " if (false) { ... } → (removed)"
+          },
+          {
+            "type": "CommentLine",
+            "value": " if (true) { A } else { B } → { A }"
+          },
+          {
+            "type": "CommentLine",
+            "value": " while (false) { ... } → (removed)"
+          },
+          {
+            "type": "CommentLine",
+            "value": " false ? A : B → B"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Code after return → (removed)"
+          }
+        ],
+        "leadingComments": [
+          {
+            "type": "CommentLine",
+            "value": " Test Case 9: Dead Code Elimination"
+          },
+          {
+            "type": "CommentLine",
+            "value": " Tests: Unreachable code, constant conditions"
+          }
+        ],
+        "_state_id": "34dc5dce-31e6-4373-b53d-9b7b7cbdb893",
+        "callCount": 0
+      }
+    ],
+    "directives": [],
+    "_state_id": "a44c9eda-1c2f-42bb-8ed5-5827ee4e83ea"
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " Test Case 9: Dead Code Elimination"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Tests: Unreachable code, constant conditions"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Dead if branch"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should be removed"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Always-true if"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should be removed"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Dead while loop"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should be removed"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Dead ternary"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should become: var ternary = 2"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Unreachable after return"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should be removed"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should be removed"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Nested dead code"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should be removed"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Constant arithmetic enabling DCE"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Should be removed after constant folding"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Expected transformations:"
+    },
+    {
+      "type": "CommentLine",
+      "value": " if (false) { ... } → (removed)"
+    },
+    {
+      "type": "CommentLine",
+      "value": " if (true) { A } else { B } → { A }"
+    },
+    {
+      "type": "CommentLine",
+      "value": " while (false) { ... } → (removed)"
+    },
+    {
+      "type": "CommentLine",
+      "value": " false ? A : B → B"
+    },
+    {
+      "type": "CommentLine",
+      "value": " Code after return → (removed)"
+    }
+  ]
+}
