@@ -51,6 +51,7 @@ const GrokInterface = require("./lib/grok/interface");
 const { generateMalwareReport, formatReportConsole, formatReportMarkdown } = require("./lib/malware_report");
 const { ProgressTimer, tracker } = require("./lib/progress");
 const { CLIParser, showHelp, showVersion, showErrors } = require("./lib/cli");
+const BatchProcessor = require("./lib/batch_processor");
 
 // Parse CLI arguments first
 const cliParser = new CLIParser();
@@ -84,6 +85,141 @@ if (cliOptions.verbose) config.verbose = true;
 if (cliOptions.quiet) config.verbose = false;
 if (cliOptions.maxIterations !== null) config.maxIterations = cliOptions.maxIterations;
 if (cliOptions.timeout !== null) config.timeoutMs = cliOptions.timeout;
+
+// BATCH MODE ROUTING
+if (cliOptions.mode === 'batch') {
+    // Import batch processor module at the top
+    const batchProcessor = new BatchProcessor({
+        recursive: cliOptions.recursive,
+        pattern: cliOptions.pattern,
+        exclude: cliOptions.exclude,
+        maxFiles: cliOptions.maxFiles,
+        verbose: cliOptions.verbose,
+        outputDir: cliOptions.outputDir
+    });
+
+    // Run batch scan and processing
+    (async function() {
+        try {
+            console.log(`\n🔍 Batch Processing Mode\n${'='.repeat(50)}\n`);
+            console.log(`Directory: ${cliOptions.scanDirectory}`);
+            console.log(`Pattern: ${cliOptions.pattern}`);
+            console.log(`Recursive: ${cliOptions.recursive}`);
+            console.log(`Max files: ${cliOptions.maxFiles}`);
+            if (cliOptions.outputDir) {
+                console.log(`Output dir: ${cliOptions.outputDir}`);
+            }
+            console.log('');
+
+            // Process function for each file
+            const processFile = async (filePath) => {
+                return new Promise((resolve, reject) => {
+                    const { spawn } = require('child_process');
+
+                    // Determine output path
+                    let outputPath;
+                    if (cliOptions.outputDir) {
+                        const path = require('path');
+                        const basename = path.basename(filePath);
+                        outputPath = path.join(cliOptions.outputDir, `${basename}.out`);
+                    } else {
+                        outputPath = `${filePath}.out`;
+                    }
+
+                    // Build arguments for single-file processor
+                    const args = [
+                        __filename,  // This script
+                        filePath,
+                        '-o', outputPath,
+                        '--quiet'    // Always quiet in batch mode
+                    ];
+
+                    // Add flags from batch options
+                    if (cliOptions.noGrok) args.push('--no-grok');
+                    if (cliOptions.noUnpack) args.push('--no-unpack');
+                    if (cliOptions.noMalwareReport) args.push('--no-malware-report');
+                    if (cliOptions.maxIterations) {
+                        args.push('--max-iterations', cliOptions.maxIterations.toString());
+                    }
+                    if (cliOptions.timeout) {
+                        args.push('--timeout', cliOptions.timeout.toString());
+                    }
+
+                    // Spawn single-file processor
+                    const proc = spawn('node', args, {
+                        stdio: ['pipe', 'pipe', 'pipe'],
+                        env: process.env
+                    });
+
+                    let stdout = '';
+                    let stderr = '';
+
+                    proc.stdout.on('data', (data) => {
+                        stdout += data.toString();
+                    });
+
+                    proc.stderr.on('data', (data) => {
+                        stderr += data.toString();
+                    });
+
+                    proc.on('close', (code) => {
+                        if (code === 0) {
+                            // Parse output for statistics
+                            const bundlesUnpacked = /Unpacking bundles/.test(stdout) ? 1 : 0;
+                            const malwareDetected = /⚠️  Malware/.test(stdout);
+                            const obfuscated = /obfuscator\.io|Control flow|Dead code/.test(stdout);
+
+                            resolve({
+                                bundlesUnpacked,
+                                malwareDetected,
+                                obfuscated
+                            });
+                        } else {
+                            reject(new Error(stderr || `Process exited with code ${code}`));
+                        }
+                    });
+
+                    proc.on('error', (err) => {
+                        reject(err);
+                    });
+
+                    // Provide 'n' answer for any Grok confirmation prompts
+                    proc.stdin.write('n\n');
+                    proc.stdin.end();
+                });
+            };
+
+            // Scan and process
+            const stats = await batchProcessor.scan(
+                cliOptions.scanDirectory,
+                processFile,
+                { quiet: cliOptions.quiet }
+            );
+
+            // Display summary
+            console.log(batchProcessor.generateSummaryReport());
+
+            // Export summary if requested
+            if (cliOptions.summary) {
+                const summaryPath = batchProcessor.exportSummaryJSON(cliOptions.summary);
+                console.log(`📄 Summary exported: ${summaryPath}\n`);
+            }
+
+            process.exit(0);
+        } catch (err) {
+            console.error(`\n❌ Batch processing failed: ${err.message}`);
+            if (cliOptions.verbose) {
+                console.error(err.stack);
+            }
+            process.exit(1);
+        }
+    })();
+
+    // Exit here - don't continue to single file processing
+    return;
+}
+
+// SINGLE FILE MODE (existing logic continues below)
 
 String.prototype.last = function () {
     return this[this.length - 1];
