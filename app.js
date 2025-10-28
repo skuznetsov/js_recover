@@ -49,6 +49,7 @@ const unwrapUMD = require("./lib/mutators/unwrap_umd");
 const Utils = require("./lib/utils");
 const GrokInterface = require("./lib/grok/interface");
 const { generateMalwareReport, formatReportConsole, formatReportMarkdown } = require("./lib/malware_report");
+const { ProgressTimer, tracker } = require("./lib/progress");
 
 if (typeof (config.verbose) === "undefined") {
     console.error(`ERROR: Cannot find config file at ${process.env.NODE_CONFIG_DIR}`);
@@ -93,8 +94,12 @@ function dumpScopes(scopes, parent, level = 0) {
 
 
 const processingFileName = fs.realpathSync(process.argv[2] || config.defaultFileToProcess);
+
+// Read file with progress indicator
+const readTimer = new ProgressTimer('Reading file', true); // Always show progress
 const code = fs.readFileSync(processingFileName, "utf8");
-console.log(`Processing ${processingFileName}...`);
+const fileSizeMB = (code.length / (1024 * 1024)).toFixed(2);
+readTimer.done(`${fileSizeMB} MB`);
 
 // let mapUrl = (code.match(/^\/\/#\s*sourceMappingURL=(.+)$/gim)||[""])[0].replace(/^\/\/#\s*sourceMappingURL=/, '');
 
@@ -132,7 +137,11 @@ console.log(`Processing ${processingFileName}...`);
 //         resolve(null);
 //     }
 // }).then (smc => {
+
+// Parse with progress indicator
+const parseTimer = new ProgressTimer('Parsing JavaScript', true);
 const ast = parser.parse(code, config.parser);
+parseTimer.done();
 
 // FIX P2-4: Validate AST size (protection against malware "AST bombs")
 function validateAST(ast, fileSize) {
@@ -300,6 +309,7 @@ const processingContext = {
 // Pre-step: Unpack bundles FIRST (before scope analysis)
 // This is critical for malware analysis - unpacks webpack/AMD/UMD bundles
 // Loop until convergence to handle UMD-wrapped bundles
+const unpackTimer = new ProgressTimer('Unpacking bundles', true);
 let status;
 let unpackIterations = 0;
 const MAX_UNPACK_ITERATIONS = 10;
@@ -315,11 +325,13 @@ do {
         ],
         processingContext
     );
-    if (config.verbose && status) {
-        console.log(`  → Unpack iteration ${unpackIterations}: changes detected, continuing...`);
+    if (config.verbose && status && unpackIterations < MAX_UNPACK_ITERATIONS) {
+        unpackTimer.update(`iteration ${unpackIterations}`);
     }
 } while (status && unpackIterations < MAX_UNPACK_ITERATIONS);
+unpackTimer.done(`${unpackIterations} iteration${unpackIterations > 1 ? 's' : ''}`);
 
+const scopeTimer = new ProgressTimer('Analyzing scopes', true);
 status = traverseTopDown(
     ast,
     [
@@ -329,8 +341,9 @@ status = traverseTopDown(
     ],
     processingContext
 );
+scopeTimer.done();
 
-
+const initTimer = new ProgressTimer('Initial deobfuscation', true);
 status = traverseTopDown(
     ast,
     [
@@ -340,11 +353,14 @@ status = traverseTopDown(
     ],
     processingContext
 );
+initTimer.done();
 
 let trial = 0;
 const MAX_ITERATIONS = config.maxIterations || 100; // configurable safety limit
 const TIMEOUT_MS = config.timeoutMs || 300000; // 5 minutes default
 const convergenceStartTime = Date.now();
+
+const convergenceTimer = new ProgressTimer('Processing iterations', true);
 
 while (trial < MAX_ITERATIONS) {
     trial++;
@@ -352,13 +368,13 @@ while (trial < MAX_ITERATIONS) {
     // FIX P2-1: Add timeout protection against malware anti-analysis
     const elapsed = Date.now() - convergenceStartTime;
     if (elapsed > TIMEOUT_MS) {
-        console.warn(`\n⚠️  WARNING: Convergence timeout after ${trial} iterations (${elapsed}ms)`);
-        console.warn(`   This may indicate malware anti-analysis tricks.`);
-        console.warn(`   Stopping to prevent infinite analysis.`);
+        convergenceTimer.fail(`timeout after ${trial} iterations`);
+        console.warn(`⚠️  WARNING: This may indicate malware anti-analysis tricks.`);
         break;
     }
 
-    console.log(`Iteration ${trial}... (${(elapsed / 1000).toFixed(1)}s elapsed)`);
+    // Update progress (only visible in TTY mode due to spinner)
+    convergenceTimer.update(`iteration ${trial}`);
 
     // Fresh variable for THIS iteration only
     // OPTIMIZATION: Single traversal with multiple mutators (3x faster!)
@@ -378,18 +394,18 @@ while (trial < MAX_ITERATIONS) {
 
     // If NOTHING changed in this iteration - convergence reached
     if (!changedInThisIteration) {
-        console.log(`✓ Converged after ${trial} iterations.`);
+        convergenceTimer.done(`converged after ${trial} iterations`);
         break;
     }
-
-    if (config.verbose) {
-        console.log(`  → Changes detected, continuing...`);
-    }
 }
 
+// If loop ended without break, check why
 if (trial === MAX_ITERATIONS) {
-    console.warn(`⚠ WARNING: Reached max iterations (${MAX_ITERATIONS}) without convergence`);
+    // Hit max iterations without convergence
+    convergenceTimer.fail(`max iterations (${MAX_ITERATIONS})`);
+    console.warn(`⚠ WARNING: This may indicate complex obfuscation or anti-analysis code`);
 }
+// If we broke due to timeout, timer already closed (in timeout handler)
 
 // Continue processing (async for Grok support)
 (async function() {
@@ -520,24 +536,28 @@ if (trial === MAX_ITERATIONS) {
     Utils.createAllFoldersInPath(outputFilePath);
 
     let res = null;
+    const genTimer = new ProgressTimer('Generating code', true);
     try {
-        console.log("Generating code...")
         res = jsGen.generate();
     //    res = astring.generate(ast);
         // res = generate(ast, {});
+        genTimer.done();
     } catch(ex) {
-        console.log("ERROR:", ex.stack);
+        genTimer.fail(ex.message);
+        console.error("ERROR:", ex.stack);
     }
 
     if (res) {
-        console.log("Writing generated code...")
-
+        const writeTimer = new ProgressTimer('Writing output', true);
         try {
             fs.writeFileSync(outputFilePath, res.code);
-            console.log(`✓ Saved into ${outputFilePath}`);
+            const outputSizeMB = (res.code.length / (1024 * 1024)).toFixed(2);
+            writeTimer.done(`${outputSizeMB} MB`);
+            console.log(`✓ Saved to ${outputFilePath}`);
             process.exit(0);
         } catch (err) {
-            console.log(`ERROR: Cannot save into ${outputFilePath}`);
+            writeTimer.fail(err.message);
+            console.error(`ERROR: Cannot save to ${outputFilePath}`);
             console.error(err);
             process.exit(1);
         }
