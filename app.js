@@ -50,7 +50,8 @@ const Utils = require("./lib/utils");
 const GrokInterface = require("./lib/grok/interface");
 const { generateMalwareReport, formatReportConsole, formatReportMarkdown } = require("./lib/malware_report");
 const { ProgressTimer, tracker } = require("./lib/progress");
-const { CLIParser, showHelp, showVersion, showErrors } = require("./lib/cli");
+const { CLIParser, showHelp, showVersion, showErrors, showPresets, generateConfig } = require("./lib/cli");
+const { ConfigLoader } = require("./lib/config_loader");
 const BatchProcessor = require("./lib/batch_processor");
 
 // Parse CLI arguments first
@@ -68,19 +69,75 @@ if (cliOptions.version) {
     process.exit(0);
 }
 
+// Handle --list-presets
+if (cliOptions.listPresets) {
+    showPresets();
+    process.exit(0);
+}
+
+// Handle --init
+if (cliOptions.init) {
+    const success = generateConfig(cliOptions.initPreset);
+    process.exit(success ? 0 : 1);
+}
+
 // Show CLI errors
 if (!isValid) {
     showErrors(cliErrors);
     process.exit(1);
 }
 
-// Validate config
+// Validate base config
 if (typeof (config.verbose) === "undefined") {
     console.error(`ERROR: Cannot find config file at ${process.env.NODE_CONFIG_DIR}`);
     process.exit(1);
 }
 
-// Apply CLI options to config (CLI overrides config file)
+// Load .js_recover.json if exists (overrides base config, but CLI overrides this)
+const configLoader = new ConfigLoader();
+const userConfig = configLoader.load({ verbose: cliOptions.verbose });
+
+// Apply user config to base config (if loaded)
+if (userConfig) {
+    if (userConfig.verbose !== undefined) config.verbose = userConfig.verbose;
+    if (userConfig.quiet !== undefined) config.verbose = !userConfig.quiet;
+    if (userConfig.noGrok !== undefined && !cliOptions.noGrok) cliOptions.noGrok = userConfig.noGrok;
+    if (userConfig.noUnpack !== undefined && !cliOptions.noUnpack) cliOptions.noUnpack = userConfig.noUnpack;
+    if (userConfig.noMalwareReport !== undefined && !cliOptions.noMalwareReport) cliOptions.noMalwareReport = userConfig.noMalwareReport;
+    if (userConfig.maxIterations !== undefined) config.maxIterations = userConfig.maxIterations;
+    if (userConfig.timeout !== undefined) config.timeoutMs = userConfig.timeout;
+
+    // Batch options
+    if (userConfig.batch) {
+        if (userConfig.batch.recursive !== undefined && cliOptions.recursive === true) cliOptions.recursive = userConfig.batch.recursive;
+        if (userConfig.batch.pattern !== undefined && cliOptions.pattern === '*.js') cliOptions.pattern = userConfig.batch.pattern;
+        if (userConfig.batch.exclude !== undefined) cliOptions.exclude = userConfig.batch.exclude;
+        if (userConfig.batch.maxFiles !== undefined && cliOptions.maxFiles === 1000) cliOptions.maxFiles = userConfig.batch.maxFiles;
+    }
+}
+
+// Apply preset if specified via CLI
+if (cliOptions.preset) {
+    const { PRESETS } = require('./lib/config_loader');
+    if (!PRESETS[cliOptions.preset]) {
+        console.error(`ERROR: Unknown preset "${cliOptions.preset}"`);
+        console.error(`Available presets: ${Object.keys(PRESETS).join(', ')}`);
+        process.exit(1);
+    }
+
+    console.log(`Using preset: ${cliOptions.preset}`);
+    const preset = PRESETS[cliOptions.preset];
+
+    // Apply preset (CLI flags still override)
+    if (preset.verbose !== undefined && !cliOptions.verbose) cliOptions.verbose = preset.verbose;
+    if (preset.quiet !== undefined && !cliOptions.quiet) cliOptions.quiet = preset.quiet;
+    if (preset.noGrok !== undefined && !cliOptions.noGrok) cliOptions.noGrok = preset.noGrok;
+    if (preset.noUnpack !== undefined && !cliOptions.noUnpack) cliOptions.noUnpack = preset.noUnpack;
+    if (preset.maxIterations !== undefined && cliOptions.maxIterations === null) config.maxIterations = preset.maxIterations;
+    if (preset.timeout !== undefined && cliOptions.timeout === null) config.timeoutMs = preset.timeout;
+}
+
+// Apply CLI options to config (CLI overrides everything)
 if (cliOptions.verbose) config.verbose = true;
 if (cliOptions.quiet) config.verbose = false;
 if (cliOptions.maxIterations !== null) config.maxIterations = cliOptions.maxIterations;
