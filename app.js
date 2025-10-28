@@ -53,6 +53,7 @@ const { ProgressTimer, tracker } = require("./lib/progress");
 const { CLIParser, showHelp, showVersion, showErrors, showPresets, generateConfig } = require("./lib/cli");
 const { ConfigLoader } = require("./lib/config_loader");
 const BatchProcessor = require("./lib/batch_processor");
+const { detectExoticObfuscation, decodeExoticObfuscation } = require("./lib/exotic_deobfuscators");
 
 // Parse CLI arguments first
 const cliParser = new CLIParser();
@@ -320,9 +321,52 @@ const processingFileName = cliOptions.inputFile;
 
 // Read file with progress indicator
 const readTimer = new ProgressTimer('Reading file', !cliOptions.quiet);
-const code = fs.readFileSync(processingFileName, "utf8");
+let code = fs.readFileSync(processingFileName, "utf8");
 const fileSizeMB = (code.length / (1024 * 1024)).toFixed(2);
 readTimer.done(`${fileSizeMB} MB`);
+
+// Pre-processing: Detect and decode exotic obfuscation (JSFuck, Packer, AAEncode, etc.)
+// This must happen BEFORE AST parsing since exotic obfuscators produce invalid/exotic syntax
+const exoticTimer = new ProgressTimer('Checking exotic obfuscation', !cliOptions.quiet);
+const exoticDetection = detectExoticObfuscation(code);
+
+if (exoticDetection.detected) {
+    exoticTimer.update(`detected ${exoticDetection.primary.type}`);
+    console.log(`\n⚠️  Exotic Obfuscation Detected: ${exoticDetection.primary.type}`);
+    console.log(`   Confidence: ${(exoticDetection.primary.confidence * 100).toFixed(1)}%`);
+    console.log(`   Description: ${exoticDetection.primary.description}`);
+
+    if (exoticDetection.primary.decodable) {
+        console.log(`   Attempting to decode...`);
+
+        const decodeResult = decodeExoticObfuscation(code, exoticDetection.primary.type);
+
+        if (decodeResult.success) {
+            const originalSize = code.length;
+            code = decodeResult.decoded;
+            const decodedSize = code.length;
+            const ratio = (originalSize / decodedSize).toFixed(1);
+
+            console.log(`   ✓ Successfully decoded (${originalSize} → ${decodedSize} chars, ${ratio}x compression)`);
+
+            // Save decoded version
+            const decodedPath = `${processingFileName}.decoded.js`;
+            fs.writeFileSync(decodedPath, code, 'utf8');
+            console.log(`   ✓ Saved decoded version: ${decodedPath}\n`);
+
+            exoticTimer.done(`decoded ${exoticDetection.primary.type}`);
+        } else {
+            console.log(`   ✗ Decoding failed: ${decodeResult.error}`);
+            console.log(`   Continuing with original code (may fail parsing)\n`);
+            exoticTimer.done(`decode failed, continuing`);
+        }
+    } else {
+        console.log(`   ✗ No decoder available for this type\n`);
+        exoticTimer.done(`no decoder available`);
+    }
+} else {
+    exoticTimer.done('none detected');
+}
 
 // let mapUrl = (code.match(/^\/\/#\s*sourceMappingURL=(.+)$/gim)||[""])[0].replace(/^\/\/#\s*sourceMappingURL=/, '');
 
@@ -370,6 +414,7 @@ parseTimer.done();
 function validateAST(ast, fileSize) {
     const MAX_DEPTH = config.maxAstDepth || 500;          // Max nesting depth
     const MIN_BYTES_PER_NODE = 0.5;                       // AST bomb threshold (very minified code ~1, bomb <0.5)
+    const MIN_FILE_SIZE_FOR_CHECK = 100;                  // Skip AST bomb check for tiny files (<100 bytes)
 
     let nodeCount = 0;
     let maxDepth = 0;
@@ -388,7 +433,7 @@ function validateAST(ast, fileSize) {
         // Check for AST bomb: too many nodes for file size
         // Real AST bomb: small file (<100KB) generates millions of nodes
         // Legitimate large file: proportional nodes to code size
-        if (nodeCount % 100000 === 0) { // Check every 100K nodes
+        if (fileSize >= MIN_FILE_SIZE_FOR_CHECK && nodeCount % 100000 === 0) { // Check every 100K nodes
             const bytesPerNode = fileSize / nodeCount;
             if (bytesPerNode < MIN_BYTES_PER_NODE) {
                 throw new Error(`AST bomb detected: ${nodeCount} nodes from ${fileSize} bytes (${bytesPerNode.toFixed(2)} bytes/node). Possible malware!`);
@@ -409,9 +454,9 @@ function validateAST(ast, fileSize) {
 
     traverse(ast, 0);
 
-    // Final check with actual ratio
+    // Final check with actual ratio (skip for tiny files)
     const bytesPerNode = fileSize / nodeCount;
-    if (bytesPerNode < MIN_BYTES_PER_NODE) {
+    if (fileSize >= MIN_FILE_SIZE_FOR_CHECK && bytesPerNode < MIN_BYTES_PER_NODE) {
         throw new Error(`AST bomb detected: ${nodeCount} nodes from ${fileSize} bytes (${bytesPerNode.toFixed(2)} bytes/node)`);
     }
 
