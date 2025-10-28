@@ -54,6 +54,7 @@ const { CLIParser, showHelp, showVersion, showErrors, showPresets, generateConfi
 const { ConfigLoader } = require("./lib/config_loader");
 const BatchProcessor = require("./lib/batch_processor");
 const { detectExoticObfuscation, decodeExoticObfuscation } = require("./lib/exotic_deobfuscators");
+const { saveHTMLReport } = require("./lib/html_reporter");
 
 // Parse CLI arguments first
 const cliParser = new CLIParser();
@@ -324,6 +325,9 @@ const readTimer = new ProgressTimer('Reading file', !cliOptions.quiet);
 let code = fs.readFileSync(processingFileName, "utf8");
 const fileSizeMB = (code.length / (1024 * 1024)).toFixed(2);
 readTimer.done(`${fileSizeMB} MB`);
+
+// Save original code for HTML report (before any processing)
+const originalCodeForReport = code;
 
 // Pre-processing: Detect and decode exotic obfuscation (JSFuck, Packer, AAEncode, etc.)
 // This must happen BEFORE AST parsing since exotic obfuscators produce invalid/exotic syntax
@@ -829,6 +833,37 @@ if (trial === MAX_ITERATIONS) {
             const outputSizeMB = (res.code.length / (1024 * 1024)).toFixed(2);
             writeTimer.done(`${outputSizeMB} MB`);
             console.log(`✓ Saved to ${outputFilePath}`);
+
+            // Generate HTML report if requested
+            if (cliOptions.htmlReport) {
+                const htmlTimer = new ProgressTimer('Generating HTML report', !cliOptions.quiet);
+                try {
+                    // Prepare malware report if available
+                    let malwareReportData = null;
+                    if (processingContext.malwareReport) {
+                        malwareReportData = processingContext.malwareReport;
+                    }
+
+                    saveHTMLReport({
+                        inputFile: processingFileName,
+                        outputFile: outputFilePath,
+                        originalCode: originalCodeForReport,
+                        deobfuscatedCode: res.code,
+                        stats: {
+                            iterations: trial
+                        },
+                        detection: exoticDetection,
+                        malwareReport: malwareReportData
+                    }, cliOptions.htmlReport);
+
+                    htmlTimer.done();
+                    console.log(`✓ HTML report saved: ${cliOptions.htmlReport}`);
+                } catch (htmlErr) {
+                    htmlTimer.fail(htmlErr.message);
+                    console.warn(`⚠️  Failed to generate HTML report: ${htmlErr.message}`);
+                }
+            }
+
             process.exit(0);
         } catch (err) {
             writeTimer.fail(err.message);
