@@ -55,6 +55,7 @@ const { ConfigLoader } = require("./lib/config_loader");
 const BatchProcessor = require("./lib/batch_processor");
 const { detectExoticObfuscation, decodeExoticObfuscation } = require("./lib/exotic_deobfuscators");
 const { saveHTMLReport } = require("./lib/html_reporter");
+const { analyzeFileSize, displayFileSizeAnalysis, askProceedWithLargeFile, optimizeConfigForLargeFile } = require("./lib/large_file_handler");
 
 // Parse CLI arguments first
 const cliParser = new CLIParser();
@@ -320,14 +321,30 @@ function dumpScopes(scopes, parent, level = 0) {
 // Use CLI-provided input file
 const processingFileName = cliOptions.inputFile;
 
+// P3-7: Analyze file size and optimize for large files
+const fileSizeAnalysis = analyzeFileSize(processingFileName);
+displayFileSizeAnalysis(fileSizeAnalysis, cliOptions.quiet);
+
+// Apply memory optimizations for large files
+if (fileSizeAnalysis.level === 'danger' || fileSizeAnalysis.level === 'critical') {
+    config = optimizeConfigForLargeFile(config, fileSizeAnalysis);
+    if (!cliOptions.quiet) {
+        console.log('✓ Applied memory optimizations for large file');
+    }
+}
+
 // Read file with progress indicator
 const readTimer = new ProgressTimer('Reading file', !cliOptions.quiet);
 let code = fs.readFileSync(processingFileName, "utf8");
 const fileSizeMB = (code.length / (1024 * 1024)).toFixed(2);
 readTimer.done(`${fileSizeMB} MB`);
 
-// Save original code for HTML report (before any processing)
-const originalCodeForReport = code;
+// P3-7: Save original code ONLY if HTML report is requested (memory optimization)
+// This avoids duplicating potentially large strings in memory
+let originalCodeForReport = null;
+if (cliOptions.htmlReport) {
+    originalCodeForReport = code;
+}
 
 // Pre-processing: Detect and decode exotic obfuscation (JSFuck, Packer, AAEncode, etc.)
 // This must happen BEFORE AST parsing since exotic obfuscators produce invalid/exotic syntax
@@ -687,6 +704,13 @@ if (trial === MAX_ITERATIONS) {
 
 // Continue processing (async for Grok support)
 (async function() {
+    // P3-7: Ask for confirmation if file is too large
+    const proceedWithLargeFile = await askProceedWithLargeFile(fileSizeAnalysis);
+    if (!proceedWithLargeFile) {
+        console.log('❌ Processing cancelled by user');
+        process.exit(0);
+    }
+
     // Handle deferred user confirmation for expensive operations
     if (grokEnabled === 'ASK_USER') {
         const answer = await askUserConfirmation('\nProceed with Grok analysis? (y/n): ');
