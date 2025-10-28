@@ -50,11 +50,40 @@ const Utils = require("./lib/utils");
 const GrokInterface = require("./lib/grok/interface");
 const { generateMalwareReport, formatReportConsole, formatReportMarkdown } = require("./lib/malware_report");
 const { ProgressTimer, tracker } = require("./lib/progress");
+const { CLIParser, showHelp, showVersion, showErrors } = require("./lib/cli");
 
+// Parse CLI arguments first
+const cliParser = new CLIParser();
+const { options: cliOptions, errors: cliErrors, isValid } = cliParser.parse();
+
+// Handle --help and --version first (before config check)
+if (cliOptions.help) {
+    showHelp();
+    process.exit(0);
+}
+
+if (cliOptions.version) {
+    showVersion();
+    process.exit(0);
+}
+
+// Show CLI errors
+if (!isValid) {
+    showErrors(cliErrors);
+    process.exit(1);
+}
+
+// Validate config
 if (typeof (config.verbose) === "undefined") {
     console.error(`ERROR: Cannot find config file at ${process.env.NODE_CONFIG_DIR}`);
     process.exit(1);
 }
+
+// Apply CLI options to config (CLI overrides config file)
+if (cliOptions.verbose) config.verbose = true;
+if (cliOptions.quiet) config.verbose = false;
+if (cliOptions.maxIterations !== null) config.maxIterations = cliOptions.maxIterations;
+if (cliOptions.timeout !== null) config.timeoutMs = cliOptions.timeout;
 
 String.prototype.last = function () {
     return this[this.length - 1];
@@ -93,10 +122,11 @@ function dumpScopes(scopes, parent, level = 0) {
 
 
 
-const processingFileName = fs.realpathSync(process.argv[2] || config.defaultFileToProcess);
+// Use CLI-provided input file
+const processingFileName = cliOptions.inputFile;
 
 // Read file with progress indicator
-const readTimer = new ProgressTimer('Reading file', true); // Always show progress
+const readTimer = new ProgressTimer('Reading file', !cliOptions.quiet);
 const code = fs.readFileSync(processingFileName, "utf8");
 const fileSizeMB = (code.length / (1024 * 1024)).toFixed(2);
 readTimer.done(`${fileSizeMB} MB`);
@@ -139,7 +169,7 @@ readTimer.done(`${fileSizeMB} MB`);
 // }).then (smc => {
 
 // Parse with progress indicator
-const parseTimer = new ProgressTimer('Parsing JavaScript', true);
+const parseTimer = new ProgressTimer('Parsing JavaScript', !cliOptions.quiet);
 const ast = parser.parse(code, config.parser);
 parseTimer.done();
 
@@ -258,10 +288,10 @@ function askUserConfirmation(question) {
     });
 }
 
-// Initialize Grok interface if API key is available
+// Initialize Grok interface if API key is available and not disabled via CLI
 let grokInterface = null;
 let grokEnabled = false;
-if (process.env.XAI_API_KEY && config.useGrokForVariables !== false) {
+if (!cliOptions.noGrok && process.env.XAI_API_KEY && config.useGrokForVariables !== false) {
     // Estimate cost BEFORE initializing Grok
     const costEstimate = estimateGrokCost(astStats.nodeCount);
 
@@ -308,30 +338,36 @@ const processingContext = {
 
 // Pre-step: Unpack bundles FIRST (before scope analysis)
 // This is critical for malware analysis - unpacks webpack/AMD/UMD bundles
-// Loop until convergence to handle UMD-wrapped bundles
-const unpackTimer = new ProgressTimer('Unpacking bundles', true);
+// Can be skipped with --no-unpack flag for faster processing
 let status;
-let unpackIterations = 0;
-const MAX_UNPACK_ITERATIONS = 10;
-do {
-    unpackIterations++;
-    status = traverseTopDown(
-        ast,
-        [
-            unwrapUMD,             // Unwrap UMD wrappers first to expose inner bundles
-            extractNestedBundles,  // Extract bundle-in-bundle strings
-            unpackBundles,         // Then unwrap bundled code
-            removeLocationInformation
-        ],
-        processingContext
-    );
-    if (config.verbose && status && unpackIterations < MAX_UNPACK_ITERATIONS) {
-        unpackTimer.update(`iteration ${unpackIterations}`);
-    }
-} while (status && unpackIterations < MAX_UNPACK_ITERATIONS);
-unpackTimer.done(`${unpackIterations} iteration${unpackIterations > 1 ? 's' : ''}`);
+if (!cliOptions.noUnpack) {
+    // Loop until convergence to handle UMD-wrapped bundles
+    const unpackTimer = new ProgressTimer('Unpacking bundles', !cliOptions.quiet);
+    let unpackIterations = 0;
+    const MAX_UNPACK_ITERATIONS = 10;
+    do {
+        unpackIterations++;
+        status = traverseTopDown(
+            ast,
+            [
+                unwrapUMD,             // Unwrap UMD wrappers first to expose inner bundles
+                extractNestedBundles,  // Extract bundle-in-bundle strings
+                unpackBundles,         // Then unwrap bundled code
+                removeLocationInformation
+            ],
+            processingContext
+        );
+        if (config.verbose && status && unpackIterations < MAX_UNPACK_ITERATIONS) {
+            unpackTimer.update(`iteration ${unpackIterations}`);
+        }
+    } while (status && unpackIterations < MAX_UNPACK_ITERATIONS);
+    unpackTimer.done(`${unpackIterations} iteration${unpackIterations > 1 ? 's' : ''}`);
+} else {
+    // Just remove location information if unpacking is skipped
+    status = traverseTopDown(ast, [removeLocationInformation], processingContext);
+}
 
-const scopeTimer = new ProgressTimer('Analyzing scopes', true);
+const scopeTimer = new ProgressTimer('Analyzing scopes', !cliOptions.quiet);
 status = traverseTopDown(
     ast,
     [
@@ -343,7 +379,7 @@ status = traverseTopDown(
 );
 scopeTimer.done();
 
-const initTimer = new ProgressTimer('Initial deobfuscation', true);
+const initTimer = new ProgressTimer('Initial deobfuscation', !cliOptions.quiet);
 status = traverseTopDown(
     ast,
     [
@@ -360,7 +396,7 @@ const MAX_ITERATIONS = config.maxIterations || 100; // configurable safety limit
 const TIMEOUT_MS = config.timeoutMs || 300000; // 5 minutes default
 const convergenceStartTime = Date.now();
 
-const convergenceTimer = new ProgressTimer('Processing iterations', true);
+const convergenceTimer = new ProgressTimer('Processing iterations', !cliOptions.quiet);
 
 while (trial < MAX_ITERATIONS) {
     trial++;
@@ -531,12 +567,13 @@ if (trial === MAX_ITERATIONS) {
     cleanupParentReferences(ast);
     cleanupContext(processingContext);
 
-    const outputFilePath = `${processingFileName}.out`;
+    // Use CLI-provided output file
+    const outputFilePath = cliOptions.outputFile;
 
     Utils.createAllFoldersInPath(outputFilePath);
 
     let res = null;
-    const genTimer = new ProgressTimer('Generating code', true);
+    const genTimer = new ProgressTimer('Generating code', !cliOptions.quiet);
     try {
         res = jsGen.generate();
     //    res = astring.generate(ast);
@@ -548,7 +585,7 @@ if (trial === MAX_ITERATIONS) {
     }
 
     if (res) {
-        const writeTimer = new ProgressTimer('Writing output', true);
+        const writeTimer = new ProgressTimer('Writing output', !cliOptions.quiet);
         try {
             fs.writeFileSync(outputFilePath, res.code);
             const outputSizeMB = (res.code.length / (1024 * 1024)).toFixed(2);
