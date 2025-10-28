@@ -290,6 +290,7 @@ if (process.env.XAI_API_KEY && config.useGrokForVariables !== false) {
 // FIX: Use context object instead of global state
 // This prevents scope pollution between multiple file processing
 const processingContext = {
+    ast: ast,  // For obfuscation pattern detection
     astScopes: {},  // Scope storage (replaces global.astScopes)
     config: config,
     sourceFileName: processingFileName,  // For webpack bundle unpacking
