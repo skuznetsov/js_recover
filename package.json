@@ -13,7 +13,7 @@
     "@babel/generator": "^7.15.8",
     "@babel/types": "^7.10.5",
     "astring": "^1.7.5",
-    "axios": "^1.12.2",
+    "axios": "^1.13.5",
     "bluebird": "^3.7.2",
     "config": "^4.1.1",
     "convert-source-map": "^1.7.0",
